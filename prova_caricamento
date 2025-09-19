@@ -1,0 +1,72 @@
+using Logic.Core.Array;
+
+namespace Logic.Core.Esercizi
+{
+    public class AltriAlgoritmiHelper
+    {
+        public static bool Palindroma(string sorgente)
+        {
+            return true;
+        }
+
+        public static int CalcolaNumeroFibonacci(int interazioni)
+        {
+            return 0;
+        }
+
+        public static int[] CalcolaListaFibonacci(int numeroDiElementi)
+        {
+            return [0, 1];
+        }
+
+        public static int EsploraArray(int[] collezione, int maximumValue)
+        {
+            return 0;
+        }
+
+        public static int EsploraArrayAlContrario(int[] collezione, int maximumValue)
+        {
+            return 0;
+        }
+
+        public static int[] ControllaPezzi(int[] supermercato1, int[] supermercato2)
+        {
+            return [0, 1];
+        }
+
+        public static decimal?[] ConfrontaPrezzi(decimal?[] supermercato1, decimal?[] supermercato2)
+        {
+            return [0, 1];
+        }
+
+        public static decimal[] CalcolaSconto(decimal[] prezzoIngrosso, decimal[] quantita, decimal specialPrice)
+        {
+            return [0, 1];
+        }
+
+        public static bool ValidaPunteggio(double punteggioArray, double punteggioStringhe)
+        {
+            return false;
+        }
+
+
+        public static int CercaSecondoMassimo(int[] collezione) => CercaMassimiSuccessivi(collezione, 2);
+
+        public static int CercaMassimiSuccessivi(int[] collezione, int iterations)
+        {
+            if (iterations<=collezione.Length){
+                return 0;
+            }
+            int indice_max_attuale = collezione[0];
+            for(int i=collezione.Length; i<collezione.Length; i--)
+            {
+                for(int j=0; j<collezione.Length; j++)
+                {
+
+                }
+            }
+
+            return 0;
+        }
+    }
+}
