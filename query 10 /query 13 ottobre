@@ -1,0 +1,87 @@
+USE [master];
+
+GO
+
+IF NOT EXISTS (
+
+SELECT name
+
+FROM sys.databases
+
+WHERE name = N'Academy')
+ 
+CREATE DATABASE Academy;
+
+GO
+ 
+CREATE TABLE Hobbits
+
+(
+
+    Nome VARCHAR(50),
+
+    Cognome VARCHAR(50)
+
+);
+
+ 
+
+
+INSERT INTO dbo.Hobbits
+
+(
+
+    Nome,
+
+    Cognome
+
+)
+
+VALUES
+
+('Bilbo', 'Baggins'),
+
+('Frodo', 'Baggins'),
+
+('Sam', 'Gamgee'),
+
+('Merry', 'Brandybuck'),
+
+('Pippin', 'Took');
+ 
+CREATE SCHEMA lotr
+
+go
+
+ALTER SCHEMA lotr TRANSFER dbo.hobbits;
+
+ 
+INSERT INTO lotr.Hobbits
+
+(
+
+    Nome, Cognome
+
+)
+
+VALUES
+
+('Daisy', 'Boffin');
+ 
+https://www.di.unito.it/~stefano/Mathematica-Articoli/SistemaSolare/index.html
+
+  index.html
+
+ 
+INSERT INTO lotr.Hobbits
+
+(
+
+    Nome
+
+)
+
+VALUES
+
+('Gollum');
+ 
