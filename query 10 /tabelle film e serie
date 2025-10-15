@@ -1,0 +1,97 @@
+USE [Academy]
+GO
+
+/****** Object:  Table [lotr].[Film]    Script Date: 10/15/2025 5:29:47 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [lotr].[Film](
+	[Titolo] [nvarchar](255) NULL,
+	[AnnoDiUscita] [smallint] NULL
+) ON [PRIMARY]
+GO
+
+
+/*  tabella */
+
+
+
+USE [Academy]
+GO
+
+/****** Object:  Table [lotr].[Libri]    Script Date: 10/15/2025 5:33:15 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [lotr].[Libri](
+	[Titolo] [nvarchar](255) NOT NULL,
+	[AnnoDiUscita] [smallint] NOT NULL
+) ON [PRIMARY]
+GO
+
+
+/*dati */
+
+
+INSERT INTO libri ([Titolo], [AnnoDiUscita])
+VALUES
+( N'Il giovane Holden', 1951 ),
+( N'Dr. Jekyll e Mr. Hyde', 1886 ),
+( N'Dune', 1965 ),
+( N'L''idiota', 1869 ),
+( N'Le barzellette di Totti', 2003 ),
+( N'I ragazzi della via Pal', 1907 ),
+( N'Il sole nudo', 1957 ),
+( N'La vita davanti a sè', 1975 ),
+( N'L''uomo in fuga', 1984 ),
+( N'La materia del cosmo', 2008 ),
+( N'Assassinio sull''Orient Express', 1934 ),
+( N'The Wolf of wall Street', 1999 ),
+( N'Fight Club', 1996 ),
+( N'L''uomo che scambiò sua moglie per un cappello', 1985 ),
+( N'Il Signore degli Anelli', 1954 ),
+( N'Una vita come tante', 2015 ),
+( N'L''inferno', 1306 ),
+( N'L''Aleph', 1949 )
+
+
+
+
+/*  dati 2*/
+
+
+INSERT INTO film ([Titolo], [AnnoDiUscita])
+VALUES
+( N'I sogni segreti di Walter Mitty', 2013 ),
+( N'Pulp Fiction', 1994 ),
+( N'Dr. Jekyll e Mr. Hyde', 1941 ),
+( N'La montagna sacra', 1973 ),
+( N'Dune', 2021 ),
+( N'Full metal jacket', 1987 ),
+( N'Avatar', 2009 ),
+( N'Taxi Driver', 1976 ),
+( N'I ragazzi della via Pal', 1969 ),
+( N'Le Iene', 1992 ),
+( N'Moonrise kingdom', 2012 ),
+( N'Cars', 2006 ),
+( N'L''uomo in fuga', 2025 ),
+( N'Gattaca', 1997 ),
+( N'Assassinio sull''Orient Express', 2017 ),
+( N'The Wolf of wall Street', 2013 ),
+( N'Fight Club', 1999 ),
+( N'Blow', 2001 ),
+( N'Il Signore degli Anelli', 2001 ),
+( N'Whiplash', 2014 ),
+( N'Bastardi senza gloria', 2009 ),
+( N'Il settimo sigillo', 1957 )
+
+
+
+
+
