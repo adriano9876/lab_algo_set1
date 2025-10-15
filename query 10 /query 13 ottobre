@@ -84,4 +84,135 @@ INSERT INTO lotr.Hobbits
 VALUES
 
 ('Gollum');
+
+
+
+
+
+
+
+/*qury 15 ottobre */
+--begin transaction
+--select * from lotr.Hobbits;
+--update lotr.Hobbits set eta = 1;
+--select * from lotr.Hobbits;
+--select * from lotr.Hobbits;
+--rollback
+--select * from lotr.Hobbits;
+--select @@trancount
+-- use academy
+
+--select cognome as familia ,
+--max (eta) as massimo_eta,
+--min(nome) as nomeminimo,
+--sum (eta) as somma,
+--count (cognome) as numerocognomi
+--from lotr.Hobbits
+--where cognome is null
+--group by cognome
+;
+
+
+--select cognome ,
+--sum (eta) as somma,
+--count (1) as numerocognomi
+--from lotr.Hobbits
+--group by cognome
+
+
+--select cognome,sum (eta)
+--from lotr.Hobbits
+--group by Cognome
+--having sum (eta) >50
+
+--select sum( eta ) etasomma ,cognome,genere,COUNT(1) quantita
+--from lotr.Hobbits
+--group by Cognome,genere
+--select *
+--from lotr.Hobbits;
+
+--select *
+--from lotr.film;
+--select *
+--from lotr.libri;
+
+
+--select iif (l.Titolo is null , f.titolo, l.titolo) as titolone,
+--isnull (l.titolo,f.titolo) as titolo_null, 
+--case when l.Titolo is null then f.Titolo else l.Titolo end as titoloCaseWhen,
+--l.AnnoDiUscita as anno_uscita_libro,
+--f.AnnoDiUscita as anno_uscita_film
+--from lotr.film f full join lotr.libri l on f.Titolo=l.Titolo
+
+--select l.Titolo as titolo_libro, l.AnnoDiUscita  as annouscitafilm,
+--isnull (cast (f.AnnoDiUscita as varchar(10)),'-') as anno_uscitaFilm,
+--case when f.Titolo = l.Titolo then cast (f.AnnoDiUscita as varchar) else '+' end
+--from lotr.libri l left  join lotr.film f on l.Titolo= f.Titolo
+
+
+
+--select	l.Titolo as titolo_libro, 
+--		f.Titolo as titolofilm,
+--		l.AnnoDiUscita  as annouscitafilm,
+--isnull (cast (f.AnnoDiUscita as varchar(10)),'-') as anno_uscitaFilm,
+--case when f.Titolo = l.Titolo then cast (f.AnnoDiUscita as varchar) else '+' end
+--from lotr.libri l right  join lotr.film f on l.Titolo= f.Titolo
+--where f.AnnoDiUscita>2000
+--order by anno_uscitaFilm;
+
+
+--select  titolo, AnnoDiUscita, 'film' as tipo from lotr.film
+--union
+--select titolo,AnnoDiUscita, 'libri' as tipo from lotr.Libri
+--order by AnnoDiUscita
+
+
+--select 
+--isnull (l.titolo,f.titolo) as titolo_null, 
+--l.AnnoDiUscita as anno_uscita_libro,
+--f.AnnoDiUscita as anno_uscita_film
+--from lotr.film f  join lotr.libri l on f.Titolo=l.Titolo
+
+
+
+--select  titolo, AnnoDiUscita, 'film' as tipo from lotr.film
+--union
+--select titolo,AnnoDiUscita, 'libri' as tipo from lotr.Libri
+--group by AnnoDiUscita
+
+
+
+--select	l.Titolo,
+--		f.Titolo,
+--		l.AnnoDiUscita,
+--		f.AnnoDiUscita
+--from lotr.libri l full join lotr.film f on f.Titolo= l.Titolo
+--where f.Titolo is null or l.Titolo is null
+
+
+
+--select	l.Titolo,
+--		f.Titolo,
+--		l.AnnoDiUscita,
+--		f.AnnoDiUscita
+--from lotr.libri l full join lotr.film f on f.Titolo= l.Titolo or f.titolo<f.titolo
+
+
+--select  f.*
+--from lotr.Film f inner join lotr.libri l  on l.titolo=f.titolo
+--where f.AnnoDiUscita >2000 or f.Titolo like 'd%'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  
