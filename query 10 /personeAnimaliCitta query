@@ -1,0 +1,162 @@
+/*Seleziona ciascuna nazione e il conteggio di persone nate in 
+quella nazione (chiama la colonna con il conteggio "Count")*/
+
+--select NomeNazione,COUNT(NomeNazione) conteggio
+--from (ang.Persone p  join geo.Citta c on p.CittaId= c.CittaId) 
+--  join geo.Nazioni n on n.NazioneId= c.NazioneId
+--  group by NomeNazione
+
+
+/*Seleziona nome, nazione di nascita e anno di nascita di tutte 
+le persone che hanno un secondo nome  e almeno un animale domestico -
+ordina per data di nascita decrescente*/
+
+--select distinct  p.Nome,p.Cognome,year (p.DataDiNascita ) as anno_nascita, n.NomeNazione
+--from (ang.Persone p join ang.SecondiNomi s on  p.PersonaId= s.PersonaId) 
+--join  anm.PersoneAnimali pa on p.PersonaId= pa.PersonaId 
+--join geo.Citta c3 on c3.CittaId= p.CittaId
+--join geo.Nazioni n on c3.NazioneId= n.NazioneId
+--order by anno_nascita desc
+--if @@ROWCOUNT > 0
+--SELECT 1
+--ELSE 
+--SELECT 0
+
+/* data do nascitas */
+--select ang.Persone.Nome, year(ang.Persone.DataDiNascita) as data_1,
+--2025-year(ang.Persone.DataDiNascita) as eta
+--from ang.Persone
+--order by data_1 desc
+
+
+/* prime 3 persone in ordine alfabetico ma mostrate invertito ,
+nei top 3 sempre serve un ordinamento */
+--select top (3) cognome 
+--from ang.Persone 
+--where cognome in (
+--	select top(3) cognome from ang.Persone
+--	order by cognome asc ) 
+--order by Cognome desc
+
+/* Seleziona nome e cognome (in due colonne separate) di tutte
+le persone che hanno il cognome che comincia con "Tr" */
+
+--select nome,cognome
+--from ang.Persone
+--where cognome like 'Tr%';
+
+
+/*Seleziona la data di nascita della persona più giovane */
+--select max(Persone.DataDiNascita) as [piu_giovane]
+--from ang.Persone
+
+/* Seleziona il numero totale di persone nella tabella persone*/
+--select COUNT(*) as conteggio_persone
+--from ang.Persone
+
+
+/* Seleziona nome e cognome (in due colonne separate) di tutte le persone 
+con il nome che comincia per G e il cognome che finisce per O */
+--select nome,cognome
+--from ang.Persone p
+--where p.Nome like 'G%' and p.Cognome like '%O'
+
+/*Seleziona nome, eventuale secondo nome e cognome concatenati 
+(chiama la colonna FirstLastName), delle persone che si chiamano 
+"Giovanni", "Alessandro" o "Adriano". Se il Secondo nome non esiste,
+mostra una "x" (es. Viktor x Slicaru)
+ */
+
+ --select CONCAT(nome,' ',cognome,' ',ISNULL(SecondoNome,'X')) as FirstLastName
+ --from ang.Persone p left join ang.SecondiNomi s on p.PersonaId= s.PersonaId 
+ --where p.Nome in ('Giovanni', 'Alessandro','Adriano','Stefano')
+
+ /* Seleziona i valori distinti di nazioni e anni di nascita
+ (chiama la colonna birthyear) per le persone nate in nazioni 
+ che cominciano con "I" */
+
+ --select distinct NomeNazione,year (DataDiNascita)
+ --from ang.Persone p join geo.citta c on p.CittaId=c.CittaId 
+ --join geo.Nazioni n on n.NazioneId= c.NazioneId
+ --where NomeNazione like 'i%'
+
+ /*Seleziona l'anno di nascita (chiama la colonna birthyear) più alto per ogni 
+ città per le persone che non hanno un Secondo nome*/
+
+ --select NomeCitta,max(year(DataDiNascita)) as birthyear
+ --from (ang.Persone p join geo.Citta c on p.CittaId=c.CittaId) 
+ --left join ang.SecondiNomi s2 on s2.PersonaId= p.PersonaId 
+ --where SecondoNome is null
+ --group by NomeCitta
+
+/* Seleziona i valori distinti del nome di tutte le persone che 
+non hanno gatti, ordina per nome decrescente   */
+
+;with cte_ha_gatti as (
+	select distinct p.PersonaId 
+	from ang.Persone p 
+	join anm.PersoneAnimali pa on p.PersonaId=pa.PersonaId
+	join anm.Animali a on a.AnimaleId= pa.AnimaleId 
+	join anm.TipoAnimale t on t.TipoAnimaleId= a.TipoAnimaleId
+	where  t.TipoAnimale = 'Gatto'
+)
+select nome,Cognome
+from ang.Persone p
+where p.PersonaId not in (select PersonaId from cte_ha_gatti)
+order by nome desc
+
+/* soluzione di tommaso*/
+
+--select distinct p.Nome
+--from ang.Persone p left join  anm.PersoneAnimali pa on p.PersonaId = pa.PersonaId 
+--left join anm.Animali a on pa.AnimaleId = a.AnimaleId 
+--left join anm.TipoAnimale ta on ta.TipoAnimaleId = a.TipoAnimaleId
+--where p.PersonaId not in (
+--		select p.PersonaId
+--		from ang.Persone p right join  anm.PersoneAnimali pa 
+--		on p.PersonaId = pa.PersonaId 
+--		left join anm.Animali a on pa.AnimaleId = a.AnimaleId
+--		left join anm.TipoAnimale ta on ta.TipoAnimaleId = a.TipoAnimaleId
+--		 where ta.TipoAnimale = 'Gatto'
+--		)
+--order by p.Nome desc
+
+/* duccio*/
+--select distinct nome, cognome
+--from ang.Persone P 
+--left join anm.PersoneAnimali PA on P.PersonaId=PA.PersonaId 
+--left join anm.Animali A on A.AnimaleId=PA.AnimaleId
+--left join anm.TipoAnimale T on T.TipoAnimaleId=A.TipoAnimaleId
+--group by nome,cognome
+--having STRING_AGG(T.TipoAnimale, ' ') not like '%gatto%' or STRING_AGG(T.TipoAnimale, ' ') is null
+--order by nome desc
+ 
+
+ /*Lidia*/
+ ;WITH CTE_Gatti AS (
+SELECT P.PersonaId
+FROM ang.Persone P 
+LEFT JOIN anm.PersoneAnimali PA ON P.PersonaId = PA.PersonaId
+INNER JOIN anm.Animali A ON PA.AnimaleId = A.AnimaleId
+INNER JOIN anm.TipoAnimale TA ON A.TipoAnimaleId = TA.TipoAnimaleId
+WHERE TA.TipoAnimale = 'Gatto')
+ 
+SELECT Nome, Cognome
+FROM ang.Persone P LEFT JOIN CTE_Gatti G ON P.PersonaId = G.PersonaId
+WHERE P.PersonaId NOT IN (SELECT * FROM CTE_Gatti)
+ORDER BY P.Nome DESC
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
