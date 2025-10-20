@@ -1,0 +1,217 @@
+IDENTITY+e-adriano.garaffa@HQAPEW1C966-AAQ MINGW64 ~/Documents/vs_clone_feature/MSC-Academy-Dev-7 (feature-adriano.garrafa)
+$ ls
+'Academy6Week2 (1) 1.pdf'
+ Logic_Algorithms/
+ Pegasus2.zip
+ README.md
+ Utilities.cs
+ Week01_StarterPack/
+ Week02_OOP/
+ Week03_C#_Intermediate/
+ Week04_Exercise_Week_C#/
+'Week04_Exercise_Week_C# studiare 06 -10 oggi.zip'
+ Week05_Database_Sql/
+ Week06_Database_EF/
+ Week07_Exercise_Week_Database/
+ Week08_Api/
+ Week09_Quality/
+ Week10_Toolbox/
+ Weeks11_and_12_Specializations/
+ da_copiare_linq
+ words-it-en.csv
+
+IDENTITY+e-adriano.garaffa@HQAPEW1C966-AAQ MINGW64 ~/Documents/vs_clone_feature/MSC-Academy-Dev-7 (feature-adriano.garrafa)
+$ gid add .
+bash: gid: command not found
+
+IDENTITY+e-adriano.garaffa@HQAPEW1C966-AAQ MINGW64 ~/Documents/vs_clone_feature/MSC-Academy-Dev-7 (feature-adriano.garrafa)
+$ git add .
+
+IDENTITY+e-adriano.garaffa@HQAPEW1C966-AAQ MINGW64 ~/Documents/vs_clone_feature/MSC-Academy-Dev-7 (feature-adriano.garrafa)
+$ commit
+bash: commit: command not found
+
+IDENTITY+e-adriano.garaffa@HQAPEW1C966-AAQ MINGW64 ~/Documents/vs_clone_feature/MSC-Academy-Dev-7 (feature-adriano.garrafa)
+$ git commit -m "20 ott"
+On branch feature-adriano.garrafa
+Your branch is up to date with 'origin/feature-adriano.garrafa'.
+
+nothing to commit, working tree clean
+
+IDENTITY+e-adriano.garaffa@HQAPEW1C966-AAQ MINGW64 ~/Documents/vs_clone_feature/MSC-Academy-Dev-7 (feature-adriano.garrafa)
+$ git push
+Everything up-to-date
+
+IDENTITY+e-adriano.garaffa@HQAPEW1C966-AAQ MINGW64 ~/Documents/vs_clone_feature/MSC-Academy-Dev-7 (feature-adriano.garrafa)
+$ git checkout main
+Switched to branch 'main'
+Your branch is behind 'origin/main' by 8 commits, and can be fast-forwarded.
+  (use "git pull" to update your local branch)
+
+IDENTITY+e-adriano.garaffa@HQAPEW1C966-AAQ MINGW64 ~/Documents/vs_clone_feature/MSC-Academy-Dev-7 (main)
+$ git pull
+remote: Azure Repos
+remote: Found 497 objects to send. (107 ms)
+Receiving objects: 100% (497/497), 1.29 MiB | 3.02 MiB/s, done.
+Resolving deltas: 100% (198/198), completed with 49 local objects.
+From https://dev.azure.com/msc-sandbox/Turin-academies/_git/MSC-Academy-Dev-7
+   554d842..d677451  main                    -> origin/main
+   c2d6a3e..37b363c  feature-andreina.tritto -> origin/feature-andreina.tritto
+   ca128ba..32bfa67  feature-federico.battisti -> origin/feature-federico.battisti
+   6cd6540..5a2e515  feature-giulio.pappalardo -> origin/feature-giulio.pappalardo
+   f79570e..8e5ed54  feature-lidia.rinaldi   -> origin/feature-lidia.rinaldi
+   560f707..87ee10c  feature-marta.petruzzelli -> origin/feature-marta.petruzzelli
+   f9d47ba..8919236  feature-stefano.blinio  -> origin/feature-stefano.blinio
+   abd57c7..eab12a6  feature-viktor.slicaru  -> origin/feature-viktor.slicaru
+   9e6bf3f..f5d3dc7  week4-claudio.raciti    -> origin/week4-claudio.raciti
+Updating feccf90..d677451
+Fast-forward
+ Week04_Exercise_Week_C#/Academy7Week4.pdf          | Bin 0 -> 1367029 bytes
+ .../ItaloThreeLayers/Business/BookingConverter.cs  |  41 +++++
+ .../ItaloThreeLayers/Business/BookingDto.cs        |  29 ++++
+ .../ItaloThreeLayers/Business/BookingService.cs    |  91 +++++++++++
+ .../Business/Business.csproj                       |   0
+ .../Business/CreateBookingCommand.cs               |  13 ++
+ .../Business/DeleteBookingCommand.cs               |   7 +
+ .../ItaloThreeLayers/Business/IBookingConverter.cs |  11 ++
+ .../ItaloThreeLayers/Business/IBookingService.cs   |  13 ++
+ .../Business/UpdateBookingCommand.cs               |  15 ++
+ .../DataAccess/BookingJsonRepository.cs            | 144 ++++++++++++++++++
+ .../DataAccess/BookingRepository.cs                |  63 ++++++++
+ .../ItaloThreeLayers/DataAccess/Bookings.json      |   1 +
+ .../ItaloThreeLayers/DataAccess/DataAccess.csproj  |  17 +++
+ .../DataAccess/IBookingJsonRepository.cs           |  15 ++
+ .../DataAccess/IBookingRepository.cs               |  15 ++
+ .../ItaloThreeLayers/DataAccess/JsonBooking.cs     |   9 ++
+ .../ItaloThreeLayers/Entity/Booking.cs             |  29 ++++
+ .../{ => ItaloThreeLayers}/Entity/Entity.csproj    |   0
+ .../ItaloThreeLayers/ItaloThreeLayers.sln          |  49 ++++++
+ .../ItaloThreeLayers/ItaloThreeLayers.csproj       |  19 +++
+ .../ItaloThreeLayers/ItaloThreeLayers/Program.cs   |  29 ++++
+ .../ItaloThreeLayers/Presentation/ConsoleView.cs   | 169 +++++++++++++++++++++
+ .../ItaloThreeLayers/Presentation/IConsoleView.cs  |   7 +
+ .../Presentation/Presentation.csproj               |  13 ++
+ .../Business/Business.csproj                       |  13 ++
+ .../Business/Service.cs                            |   2 +-
+ .../DataAccess/Data/Bookings.json                  |   0
+ .../DataAccess/Data/Stations.json                  |   0
+ .../DataAccess/Data/Trains.json                    |   0
+ .../DataAccess/Data/Trips.json                     |   0
+ .../DataAccess/DataAccess.csproj                   |   0
+ .../DataAccess/JsonStation.cs                      |   0
+ .../DataAccess/JsonTrip.cs                         |   0
+ .../DataAccess/Repository.cs                       |   0
+ .../Entity/Entity.csproj                           |   9 ++
+ .../Entity/Station.cs                              |   0
+ .../Entity/Trip.cs                                 |   0
+ .../{ => TrainBookingManagementSystem}/Program.cs  |   0
+ .../TrainBookingManagementSystem.csproj            |   0
+ .../TrainBookingManagementSystem.sln               |   0
+ Week06_Database_EF/Week6EF/CodeFirstExample/App.cs |   2 +-
+ .../CodeFirstExample/CodeFirstExample.csproj       |   4 +
+ .../CodeFirstExample/Data/CodeFirstDbContext.cs    |  23 ++-
+ .../20251007093919_InitialCreate.Designer.cs       | 120 +++++++++++++++
+ .../Migrations/20251007093919_InitialCreate.cs     |  84 ++++++++++
+ .../Migrations/CodeFirstDbContextModelSnapshot.cs  | 117 ++++++++++++++
+ .../Week6EF/CodeFirstExample/appsettings.json      |   2 +-
+ .../Week6EF/CodeFirstExample/readme.md             | 169 +++++++++++++++++++++
+ .../Controllers/ProductsController.cs              |   5 +-
+ .../Controllers/WarehousesController.cs            |   7 +-
+ .../WebApplication/Data/CodeFirstDbContext.cs      |  39 -----
+ .../Models/DatabaseFirstDbContext.cs               |  53 +++++++
+ .../Week6EF/WebApplication/Models/Product.cs       |  10 +-
+ .../Week6EF/WebApplication/Models/Warehouse.cs     |   5 -
+ .../Week6EF/WebApplication/Program.cs              |   3 +-
+ .../WebApplication/Resources/DatabaseFirstDb.sql   |  42 +++++
+ .../Week6EF/WebApplication/Resources/SeedDb.sql    |  31 ++++
+ .../Week6EF/WebApplication/Resources/scaffold.ps1  |   1 +
+ .../Week6EF/WebApplication/WebApplicationEF.csproj |   1 +
+ .../Week6EF/WebApplication/appsettings.json        |   2 +-
+ 61 files changed, 1470 insertions(+), 73 deletions(-)
+ create mode 100644 Week04_Exercise_Week_C#/Academy7Week4.pdf
+ create mode 100644 Week04_Exercise_Week_C#/ItaloThreeLayers/Business/BookingConverter.cs
+ create mode 100644 Week04_Exercise_Week_C#/ItaloThreeLayers/Business/BookingDto.cs
+ create mode 100644 Week04_Exercise_Week_C#/ItaloThreeLayers/Business/BookingService.cs
+ rename Week04_Exercise_Week_C#/{ => ItaloThreeLayers}/Business/Business.csproj (100%)
+ create mode 100644 Week04_Exercise_Week_C#/ItaloThreeLayers/Business/CreateBookingCommand.cs
+ create mode 100644 Week04_Exercise_Week_C#/ItaloThreeLayers/Business/DeleteBookingCommand.cs
+ create mode 100644 Week04_Exercise_Week_C#/ItaloThreeLayers/Business/IBookingConverter.cs
+ create mode 100644 Week04_Exercise_Week_C#/ItaloThreeLayers/Business/IBookingService.cs
+ create mode 100644 Week04_Exercise_Week_C#/ItaloThreeLayers/Business/UpdateBookingCommand.cs
+ create mode 100644 Week04_Exercise_Week_C#/ItaloThreeLayers/DataAccess/BookingJsonRepository.cs
+ create mode 100644 Week04_Exercise_Week_C#/ItaloThreeLayers/DataAccess/BookingRepository.cs
+ create mode 100644 Week04_Exercise_Week_C#/ItaloThreeLayers/DataAccess/Bookings.json
+ create mode 100644 Week04_Exercise_Week_C#/ItaloThreeLayers/DataAccess/DataAccess.csproj
+ create mode 100644 Week04_Exercise_Week_C#/ItaloThreeLayers/DataAccess/IBookingJsonRepository.cs
+ create mode 100644 Week04_Exercise_Week_C#/ItaloThreeLayers/DataAccess/IBookingRepository.cs
+ create mode 100644 Week04_Exercise_Week_C#/ItaloThreeLayers/DataAccess/JsonBooking.cs
+ create mode 100644 Week04_Exercise_Week_C#/ItaloThreeLayers/Entity/Booking.cs
+ rename Week04_Exercise_Week_C#/{ => ItaloThreeLayers}/Entity/Entity.csproj (100%)
+ create mode 100644 Week04_Exercise_Week_C#/ItaloThreeLayers/ItaloThreeLayers.sln
+ create mode 100644 Week04_Exercise_Week_C#/ItaloThreeLayers/ItaloThreeLayers/ItaloThreeLayers.csproj
+ create mode 100644 Week04_Exercise_Week_C#/ItaloThreeLayers/ItaloThreeLayers/Program.cs
+ create mode 100644 Week04_Exercise_Week_C#/ItaloThreeLayers/Presentation/ConsoleView.cs
+ create mode 100644 Week04_Exercise_Week_C#/ItaloThreeLayers/Presentation/IConsoleView.cs
+ create mode 100644 Week04_Exercise_Week_C#/ItaloThreeLayers/Presentation/Presentation.csproj
+ create mode 100644 Week04_Exercise_Week_C#/TrainBookingManagementSystem/Business/Business.csproj
+ rename Week04_Exercise_Week_C#/{ => TrainBookingManagementSystem}/Business/Service.cs (97%)
+ rename Week04_Exercise_Week_C#/{ => TrainBookingManagementSystem}/DataAccess/Data/Bookings.json (100%)
+ rename Week04_Exercise_Week_C#/{ => TrainBookingManagementSystem}/DataAccess/Data/Stations.json (100%)
+ rename Week04_Exercise_Week_C#/{ => TrainBookingManagementSystem}/DataAccess/Data/Trains.json (100%)
+ rename Week04_Exercise_Week_C#/{ => TrainBookingManagementSystem}/DataAccess/Data/Trips.json (100%)
+ rename Week04_Exercise_Week_C#/{ => TrainBookingManagementSystem}/DataAccess/DataAccess.csproj (100%)
+ rename Week04_Exercise_Week_C#/{ => TrainBookingManagementSystem}/DataAccess/JsonStation.cs (100%)
+ rename Week04_Exercise_Week_C#/{ => TrainBookingManagementSystem}/DataAccess/JsonTrip.cs (100%)
+ rename Week04_Exercise_Week_C#/{ => TrainBookingManagementSystem}/DataAccess/Repository.cs (100%)
+ create mode 100644 Week04_Exercise_Week_C#/TrainBookingManagementSystem/Entity/Entity.csproj
+ rename Week04_Exercise_Week_C#/{ => TrainBookingManagementSystem}/Entity/Station.cs (100%)
+ rename Week04_Exercise_Week_C#/{ => TrainBookingManagementSystem}/Entity/Trip.cs (100%)
+ rename Week04_Exercise_Week_C#/TrainBookingManagementSystem/{ => TrainBookingManagementSystem}/Program.cs (100%)
+ rename Week04_Exercise_Week_C#/TrainBookingManagementSystem/{ => TrainBookingManagementSystem}/TrainBookingManagementSystem.csproj (100%)
+ rename Week04_Exercise_Week_C#/TrainBookingManagementSystem/{ => TrainBookingManagementSystem}/TrainBookingManagementSystem.sln (100%)
+ create mode 100644 Week06_Database_EF/Week6EF/CodeFirstExample/Migrations/20251007093919_InitialCreate.Designer.cs
+ create mode 100644 Week06_Database_EF/Week6EF/CodeFirstExample/Migrations/20251007093919_InitialCreate.cs
+ create mode 100644 Week06_Database_EF/Week6EF/CodeFirstExample/Migrations/CodeFirstDbContextModelSnapshot.cs
+ create mode 100644 Week06_Database_EF/Week6EF/CodeFirstExample/readme.md
+ delete mode 100644 Week06_Database_EF/Week6EF/WebApplication/Data/CodeFirstDbContext.cs
+ create mode 100644 Week06_Database_EF/Week6EF/WebApplication/Models/DatabaseFirstDbContext.cs
+ create mode 100644 Week06_Database_EF/Week6EF/WebApplication/Resources/DatabaseFirstDb.sql
+ create mode 100644 Week06_Database_EF/Week6EF/WebApplication/Resources/SeedDb.sql
+ create mode 100644 Week06_Database_EF/Week6EF/WebApplication/Resources/scaffold.ps1
+
+IDENTITY+e-adriano.garaffa@HQAPEW1C966-AAQ MINGW64 ~/Documents/vs_clone_feature/MSC-Academy-Dev-7 (main)
+$ git chechout
+git: 'chechout' is not a git command. See 'git --help'.
+
+The most similar command is
+        checkout
+
+IDENTITY+e-adriano.garaffa@HQAPEW1C966-AAQ MINGW64 ~/Documents/vs_clone_feature/MSC-Academy-Dev-7 (main)
+$ git checkout feature-adriano.garaffa
+error: pathspec 'feature-adriano.garaffa' did not match any file(s) known to git
+
+IDENTITY+e-adriano.garaffa@HQAPEW1C966-AAQ MINGW64 ~/Documents/vs_clone_feature/MSC-Academy-Dev-7 (main)
+$ git checkout feature-adriano.garrafa
+Switched to branch 'feature-adriano.garrafa'
+Your branch is up to date with 'origin/feature-adriano.garrafa'.
+
+IDENTITY+e-adriano.garaffa@HQAPEW1C966-AAQ MINGW64 ~/Documents/vs_clone_feature/MSC-Academy-Dev-7 (feature-adriano.garrafa)
+$ git merge
+Already up to date.
+
+IDENTITY+e-adriano.garaffa@HQAPEW1C966-AAQ MINGW64 ~/Documents/vs_clone_feature/MSC-Academy-Dev-7 (feature-adriano.garrafa)
+$ git add .
+
+IDENTITY+e-adriano.garaffa@HQAPEW1C966-AAQ MINGW64 ~/Documents/vs_clone_feature/MSC-Academy-Dev-7 (feature-adriano.garrafa)
+$ git commit -m "due"
+On branch feature-adriano.garrafa
+Your branch is up to date with 'origin/feature-adriano.garrafa'.
+
+nothing to commit, working tree clean
+
+IDENTITY+e-adriano.garaffa@HQAPEW1C966-AAQ MINGW64 ~/Documents/vs_clone_feature/MSC-Academy-Dev-7 (feature-adriano.garrafa)
+$ git push
+Everything up-to-date
+
+IDENTITY+e-adriano.garaffa@HQAPEW1C966-AAQ MINGW64 ~/Documents/vs_clone_feature/MSC-Academy-Dev-7 (feature-adriano.garrafa)
+$
