@@ -1,0 +1,93 @@
+
+
+
+ottavi di finale
+*Seleziona nome e cognome (in due colonne separate) di tutte le persone che hanno il cognome che comincia con B
+*Seleziona la data di nascita della persona più giovane
+*Seleziona il numero totale di persone nella tabella persone
+Seleziona nome e cognome (in due colonne separate) di tutte le persone nate nell'anno 2003, ordinate in ordine alfabetico decrescente per cognome
+Seleziona tutti i nomi di battesimo distinti e ordinali in ordine alfabetico crescente
+Seleziona tutte le persone che hanno il nome che non finisce con E
+Seleziona nome e cognome di tutte le persone nate dopo il 2000 nella stessa colonna, chiamata "giovincelli" (non usare "+" per unire le stringhe)
+Seleziona la media degli anni di nascita di tutte le persone nella tabella
+
+
+quarti di finale
+Seleziona, per ogni anno di nascita, il numero di persone nate in quell'anno
+*Seleziona nome e cognome (in due colonne separate) di tutte le persone con il nome che comincia per G e il cognome che finisce per O
+Seleziona i valori distinti del nome di battesimo di tutte le persone che hanno il cognome che comincia per F
+Seleziona nome e data di nascita della persona più giovane, se ha secondo nome null, mostra "-"
+
+Semifinali
+Seleziona i nomi e i cognomi, separati da spazio, nella stessa colonna (chiamata "class") per tutte le persone che hanno il nome con che ricorre più di una volta
+Seleziona nome e cognome della terza persone più giovane della tabella table
+
+
+Finale
+Seleziona i nomi propri (chiama la colonna "nomi propri"), la media dell'anno di nascita e il massimo dell'altezza arrotondata al primo decimale di tutte le persone che hanno il cognome che non contiene "OS" o "CE", nate dopo il 1990 - la tabella deve avere come alias la parola "table"
+
+Seleziona tutti i nomi propri che hanno meno di tre occorrenze, e il numero di occorrenze (chiama questa colonna "conteggio nomi"), escludendo le persone con secondo nome non valorizzato; aggiungi un'ulteriore colonna con il cognome che, a parità di nome, viene prima in ordine alfabetico
+
+Seleziona i nomi propri (chiama la colonna "nomi propri") e la media dell'anno di nascita di tutte le persone che hanno il cognome che contiene "AR" o "DI", nate dopo il 1990 - la tabella deve avere come alias la parola "table"
+
+
+
+ottavi di finale
+* Seleziona ciascuna nazione e il conteggio di persone nate in quella nazione (chiama la colonna con il conteggio "Count")
+Seleziona nome, cognome e numero di animali per ciascuna persona che ne ha almeno uno  (chiama la colonna con il conteggio "PetSum"). Ordina per la colonna "PetSum" in ordine decrescente - in caso di parità, per cognome (sempre decrescente).
+
+Seleziona nome, nazione di nascita e altezza arrotondata al primo decimale di tutte le persone che hanno un secondo nome e almeno un animale domestico - ordina per data di nascita decrescente
+
+Seleziona nome, eventuale secondo nome e cognome concatenati (chiama la colonna FirstLastName), delle persone che si chiamano "Giovanni", "Alessandro" o "Adriano". Se il Secondo nome non esiste, mostra una "x" (es. Giovanni x Bertoglio)
+
+Seleziona la città di nascita, l'anno di nascita e il cognome delle prime tre persone più giovani. Escludi le persone con data di nascita mancante.
+
+*Seleziona i valori distinti di nazioni e anni di nascita (chiama la colonna birthyear) per le persone nate in nazioni che cominciano con "I"
+
+seleziona il conteggio dei nomi distinti della tabella Person e il massimo del numero di animali posseduti da una persona
+(la select deve avere una sola riga come risultato)
+
+Seleziona l'anno di nascita (chiama la colonna birthyear) più alto per ogni città per le persone che non hanno un Secondo nome
+
+
+Seleziona il numero e il tipo degli animali domestici, il nome e l'altezza approssimata al primo decimale (chiama la colonna "altezza" - non usare cast o convert) delle persone nate in Italia dopo il 1992, e che hanno il cognome che contiene la lettera "E"
+
+Seleziona i valori distinti del nome di tutte le persone che non hanno gatti, ordina per nome decrescente
+
+seleziona la media del numero dei gatti per nazione, per tutte le persone nate in Italia o che hanno il nome che comincia per  "A" o "H" o "V"
+
+
+Quarti di finale
+Seleziona i valori distinti del nome di tutte le persone che hanno più di un animale domestico e il relativo conteggio
+
+Seleziona la nazione e il numero medio di animali che hanno le persone nate in quella nazione - chiama la colonna con la media "PetCount" e convertila nel tipo nvarchar(255).
+
+Seleziona nome+secondonome (nella stessa colonna "FirstMiddleName") e data di nascita della persona nata in Italia che ha più animali
+
+Seleziona Città e Cognome di tutte le persone nate in Italia che hanno il cognome che inizia per "C" o "G" e che hanno almeno un animale. Ordina per cognome (decrescente)
+
+Seleziona nome, cognome, paese di nascita e altezza approssimata alla prima cifra decimale delle persone senza secondo nome e senza animali 
+
+Semifinale
+Seleziona il numero totale di gatti di persone non nate a Torino, che hanno il nome che comincia per "C", "B" o "G"
+Seleziona i valori distinti dei nomi propri e della nazione di nascita di tutte le persone che non hanno secondo nome
+
+Finale
+scrivi due query diverse per selezionare nome, cognome e nazione di nascita delle persone che non hanno animali - escludi le persone senza data di nascita. Ordina per nazione (decrescente) e cognome (crescente)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
