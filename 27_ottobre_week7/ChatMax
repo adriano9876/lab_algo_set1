@@ -1,0 +1,208 @@
+La proprietà EF Core da usare per abilitare la Concorrenza Ottimistica è IsRowVersion() (Fluent API) o [Timestamp] (Data Annotation)
+mappando la colonna al tipo SQL rowversion o timestamp.
+ 
+L' Eccezione C# che viene sollevata da SaveChangesAsync() quando EF Core rileva un conflitto
+DbUpdateConcurrencyException.
+ 
+Cosa significa che il salvataggio è fallito a causa di un Concurrency Token non valido
+Significa che il valore del Concurrency Token (es. il numero di versione del record) caricato dall'applicazione non corrisponde più al valore attuale presente nel database. Un altro utente (o processo) ha modificato e salvato il record nel frattempo.
+
+
+
+
+
+Ancora un paio di cose che non siamo riusciti a vedere a fondo
+ 
+Seeding in N:N
+Il metodo della Fluent API è UsingEntity() per accedere alla tabella di unione implicita.
+ 
+modelBuilder.Entity<Studente>()
+   .HasMany(s => s.Corsi)
+   .WithMany(c => c.Studenti)
+   .UsingEntity(j => j.HasData( // <-- Metodo Chiave
+       new  CorsiCorsoId = 1, StudentiStudenteId = 101 ,
+       new  CorsiCorsoId = 2, StudentiStudenteId = 101 
+   ));
+ 
+ 
+Eliminazione di massa
+Codice efficiente che evita di caricare in memoria:
+// Esegue una singola istruzione DELETE SQL direttamente sul database
+await context.Prodotti
+           .Where(p => p.Quantita == 0)
+           .ExecuteDeleteAsync();
+Questo approccio è più veloce perché:
+Zero Caricamento: Non carica N entità in memoria.
+Singolo Round Trip: Genera una sola istruzione DELETE FROM... WHERE... al database, invece di N istruzioni DELETE separate per ogni entità in un ciclo, più una chiamata finale a SaveChangesAsync().
+ 
+ Per tracciare le modifiche e configurare la relazione tra l'entità User e tutte le Entities che derivano dalla tua classe base, devi adottare una strategia con la Fluent API.
+L'obiettivo è creare una relazione Uno-a-Molti (1:N) tra User e la tabella singola generata dalla strategia Table Per Hierarchy (TPH).
+Ecco i passaggi e la configurazione corretta.
+ 
+1. Definizione delle Classi
+ 
+Definisci la classe base con una chiave esterna (UserId) e la proprietà di navigazione per l'utente che ha effettuato l'ultima modifica.
+C#
+ 
+Plain Text
+// Entità che rappresenta l'utentepublic class User{
+    public int Id { get; set; }
+    public string Username { get; set; }
+        // Non è necessario avere la collezione inversa qui per la TPH, ma è buona pratica.// Se la aggiungi, dovrai configurarla in Fluent API.// public List<EntityBase> AuditEntries { get; set; } }
+// Classe Base (Auditing)public abstract class EntityBase{
+    // Chiave primariapublic int Id { get; set; } 
+        // Chiave esterna per l'utente che ha creato o modificato l'entitàpublic int UserId { get; set; } 
+        // Proprietà di navigazionepublic virtual User User { get; set; } 
+        public DateTime CreatedDate { get; set; } 
+}
+// Entità derivata che eredita Id, UserId e Userpublic class Prodotto : EntityBase{
+    public string Nome { get; set; }
+    public decimal Prezzo { get; set; }
+}
+ 
+
+
+ 
+2. Configurazione nel $DbContext$ (Fluent API)
+ 
+La configurazione deve avvenire nel metodo OnModelCreating e deve essere applicata alla classe derivata (o, in modo più generico, al $DbSet$ dell'entità base, se lo hai).
+Il punto chiave è che la relazione è definita dalla chiave esterna (UserId) che risiede nella tabella TPH.
+ 
+Scenario 1: Configurazione Tramite un Tipo Derivato
+ 
+Se non hai un $DbSet<EntityBase>$, devi configurare la relazione su uno dei tipi derivati (e EF Core applicherà la regola a tutti gli altri, poiché usano la stessa colonna UserId).
+C#
+ 
+Plain Text
+public class AppDbContext : DbContext{
+    public DbSet<User> Users { get; set; }
+    public DbSet<Prodotto> Prodotti { get; set; } // Esposto solo un tipo derivatoprotected override void OnModelCreating(ModelBuilder modelBuilder)    {        // 1. Configurazione della TPH// EF Core rileva automaticamente la TPH e la PK (Id)// 2. Configurazione della Relazione 1:N (User -> Prodotto)        modelBuilder.Entity<Prodotto>()            .HasOne(p => p.User) // Prodotto ha UN User (FK: UserId)            .WithMany()          // User ha MOLTI Prodotti (collezione anonima)
+            .HasForeignKey(p => p.UserId) // Specifica la colonna FK in Prodotto
+            .OnDelete(DeleteBehavior.Restrict); // Evita eliminazioni a cascata// Opzionale: Se vuoi configurare la collezione inversa in User/*
+        modelBuilder.Entity<User>()
+            .HasMany<EntityBase>() // o HasMany<Prodotto>()
+            .WithOne(e => e.User)
+            // ... il resto della configurazione HasForeignKey(e => e.UserId)
+        */base.OnModelCreating(modelBuilder);
+    }
+}
+ 
+ 
+Scenario 2: Configurazione se la Classe Base è Esposta (Avanzato)
+ 
+Se hai esposto un $DbSet$ della classe base astratta, la configurazione è più diretta sull'entità padre.
+C#
+ 
+Plain Text
+public class AppDbContext : DbContext{
+    public DbSet<User> Users { get; set; }
+    public DbSet<EntityBase> Entities { get; set; } // DbSet esposto per la classe baseprotected override void OnModelCreating(ModelBuilder modelBuilder)    {
+        modelBuilder.Entity<EntityBase>()
+            .HasOne(e => e.User)
+            .WithMany() 
+            .HasForeignKey(e => e.UserId)
+            .OnDelete(DeleteBehavior.Restrict); 
+            
+        base.OnModelCreating(modelBuilder);
+    }
+}
+ 
+
+
+ 
+3. Gestione e Migrazioni
+ 
+Quando esegui Add-Migration, EF Core eseguirà due operazioni chiave:
+Creerà una singola tabella (TPH) che include tutte le proprietà derivate (Nome, Prezzo, ecc.) e le proprietà della classe base (Id, CreatedDate, UserId, Discriminator).
+Aggiungerà un vincolo di chiave esterna sul database (FK_..._UserId) tra la colonna UserId della tabella TPH e la chiave primaria (Id) della tabella Users.
+Importante: L'uso di OnDelete(DeleteBehavior.Restrict) è cruciale qui. Impedisce che la cancellazione di un User cancelli automaticamente tutti i Prodotti o altre entità correlate, garantendo l'integrità dell'audit trail.
+ 
+ 
+
+Ecco un riepilogo strutturato delle diverse modalità di creazione delle relazioni (1:1, 1:N, N:N) in Entity Framework Core 8, utilizzando le metodologie Code First.
+ 
+1. Relazione Uno-a-Molti (1:N)
+ 
+Questa è la relazione più comune (es. Cliente $\rightarrow$ Ordini).
+Metodo	Chiave Esterna (FK)	Navigazione	Configurazione Aggiuntiva
+Implicita (Convenzioni)	public int ClienteId { get; set; } (nella classe lato 'Molti', es. Ordine)	public Cliente Cliente { get; set; } public List<Ordine> Ordini { get; set; }	Nessuna. EF Core deduce la relazione dal nome della proprietà FK.
+Data Annotations	[ForeignKey("Cliente")] sulla proprietà FK (ClienteId in Ordine).	[Required] sulla FK per un vincolo $NOT \ NULL$.	 
+Fluent API	WithMany() (lato 'Molti') e HasOne() (lato 'Uno').	.HasForeignKey(o => o.ClienteId)	Controllo esplicito del nome della colonna FK e delle azioni OnDelete().
+ 
+2. Relazione Uno-a-Uno (1:1 o 1:0..1)
+ 
+Questa relazione mappa due entità a una singola riga o a due righe collegate da una chiave primaria o esterna univoca.
+Metodo	Chiave Esterna (FK)	Condizione di Unicità	Configurazione Aggiuntiva
+Implicita (Convenzioni)	NON supportata implicitamente. Richiede sempre la Fluent API.	EF Core non può distinguere una 1:1 da una 1:N basandosi solo sul nome.	ERRORE o mappatura errata. Necessaria Fluent API per disambiguare.
+Data Annotations	[ForeignKey("NomeProprietà")] o [Key]	[Required] sulla proprietà di navigazione per una relazione 1:1 rigorosa.	 
+Fluent API (Raccomandata)	WithOne() su entrambi i lati.	.HasForeignKey<EntitàDipendente>(e => e.FKId)	Utilizzo di HasForeignKey<T>() sull'entità dipendente per specificare quale FK è univoca. Questa è la modalità più chiara.
+ 
+3. Relazione Molti-a-Molti (N:N)
+ 
+Questa relazione modella associazioni tramite una tabella di unione (Join Table).
+Metodo	Tabella di Unione	Configurazioni Richieste
+Implicita (EF Core 5+)	Generata automaticamente da EF Core.	Solo proprietà di navigazione di collezione in entrambe le entità (List<Corso>, List<Studente>).
+Data Annotations	NON applicabile per N:N implicita.	Non esiste un'annotazione per definire una Join Table automatica.
+Fluent API (Generica)	UsingEntity()	.HasMany(s => s.Corsi).WithMany(c => c.Studenti).UsingEntity(...)
+Esplicita (Classe di Unione)	Classe C# dedicata (Iscrizione) con due FK e possibilmente metadati (es. DataIscrizione).	Si configura come due relazioni 1:N, una per lato.
+ 
+Riepilogo degli Strumenti
+ 
+ 
+Strumento	Uso Principale	Pro	Contro
+Convenzioni Implicite	Mappatura 1:N e PK/FK standard.	Molto veloce, minimo codice richiesto.	Fallisce con relazioni ambigue o nomi non standard.
+Data Annotations	Vincoli semplici ([Required], [Table]) e override di PK/FK.	Veloce da scrivere e leggere sulle classi.	"Inquina" il modello di dominio con attributi di persistenza, meno flessibile.
+Fluent API	Relazioni 1:1, N:N, Indici, azioni $On \ Delete$, precisione dei tipi (decimal).	Massima flessibilità, mantiene pulito il modello.	Più verboso, tutta la configurazione è centralizzata nel $DbContext$.
+ 
+La configurazione di un'azione di ON DELETE NO ACTION (o la sua variante Restrict) su una relazione Molti-a-Molti (N:N) in EF Core dipende da come è mappata la relazione: implicitamente o esplicitamente.
+In entrambi i casi, l'azione NO ACTION o Restrict garantisce che l'eliminazione di un'entità correlata fallisca se ci sono ancora associazioni attive nella tabella di unione.
+Ecco come configurarlo usando la Fluent API, che è l'unico modo per controllare questa opzione.
+ 
+1. Relazione N:N con Tabella di Unione Implicita (EF Core 5+)
+ 
+Questo è l'approccio moderno, dove non si definisce una classe C# per la tabella di unione.
+Assumiamo Studente $\leftrightarrow$ Corso.
+C#
+ 
+Plain Text
+protected override void OnModelCreating(ModelBuilder modelBuilder){
+    // ... configurazioni DbSet e HasData ...
+    modelBuilder.Entity<Studente>()        .HasMany(s => s.Corsi)        .WithMany(c => c.Studenti)        // Usa UsingEntity per accedere e configurare la Join Table generata        .UsingEntity(j => j            .ToTable("StudenteCorso") // Opzionale: Assegna un nome alla tabella di unione// Configura la chiave esterna lato 'Corso'
+            .HasOne<Corso>()
+            .WithMany()
+            .OnDelete(DeleteBehavior.Restrict), // <--- CONFIGURAZIONE CHIAVE 1// Configura la chiave esterna lato 'Studente'
+            j => j
+            .HasOne<Studente>()
+            .WithMany()
+            .OnDelete(DeleteBehavior.Restrict)  // <--- CONFIGURAZIONE CHIAVE 2
+        );
+}
+ 
+Spiegazione:
+Quando si usa .UsingEntity(), EF Core crea due chiavi esterne per la tabella di unione. Devi configurare l'azione OnDelete su entrambe le chiavi esterne che puntano alle due entità principali (Corso e Studente).
+ 
+2. Relazione N:N con Tabella di Unione Esplicita
+ 
+Se hai una classe di unione esplicita (es. Iscrizione) con metadati (come DataIscrizione), devi configurare Restrict su ogni relazione Uno-a-Molti che forma la N:N.
+Assumiamo Iscrizione è la classe di unione, con FK verso Studente e Corso.
+C#
+ 
+Plain Text
+protected override void OnModelCreating(ModelBuilder modelBuilder){
+    // Configura la relazione Iscrizione -> Studente    modelBuilder.Entity<Iscrizione>()        .HasOne(i => i.Studente)        .WithMany(s => s.Iscrizioni) // Nome della collezione in Studente        .HasForeignKey(i => i.StudenteId)        .OnDelete(DeleteBehavior.Restrict); // <--- CONFIGURAZIONE CHIAVE 1// Configura la relazione Iscrizione -> Corso
+    modelBuilder.Entity<Iscrizione>()
+        .HasOne(i => i.Corso)
+        .WithMany(c => c.Iscrizioni) // Nome della collezione in Corso
+        .HasForeignKey(i => i.CorsoId)
+        .OnDelete(DeleteBehavior.Restrict); // <--- CONFIGURAZIONE CHIAVE 2
+}
+ 
+ 
+Nota Importante su DeleteBehavior.Restrict
+ 
+In EF Core, i valori DeleteBehavior.Restrict e DeleteBehavior.NoAction hanno un effetto molto simile a livello di database SQL Server: impediscono l'eliminazione del record principale (es. Studente) finché esistono record dipendenti (es. Iscrizione).
+Per default, EF Core in uno scenario N:N non usa Cascade, ma usa ClientSetNull o Restrict per evitare cicli di eliminazione. L'uso esplicito di DeleteBehavior.Restrict è il modo più sicuro per implementare un vincolo rigido (NO ACTION).
+
+
+
+
