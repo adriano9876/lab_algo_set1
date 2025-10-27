@@ -1,1 +1,113 @@
-ciao
+dati :
+
+
+
+
+DBFirst Tutorial:
+/* copiare questo per la stringa di conessione */
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+
+  "ConnectionStrings": {
+
+    "DefaultConnection": "Server=HQAPEW1C966-AAQ;Database=ShippingCompanyDb01;User Id=sa;Password=SQL2019;TrustServerCertificate=True;"
+
+  }
+}
+
+/* Scaffold nel progetto scelto -> attento al db scelto */
+
+Scaffold-DbContext "Server=HQAPEW1C966-AAQ;Database=ShippingCompanyDb01;User Id=sa;Password=SQL2019;TrustServerCertificate=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -Force
+
+
+
+
+
+QUERY PER IL DATABASE , ATENTO ALLA VIRGOLA MANCATA
+
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    -- Tabella Customers
+    CREATE TABLE Customers (
+        CustomerId INT PRIMARY KEY IDENTITY(1,1),
+        CompanyName NVARCHAR(255)  NULL,
+        Email NVARCHAR(255)   NULL,
+        Phone NVARCHAR(255)   NULL,
+        Adress NVARCHAR(255)   NULL,
+        CreatedData DATETIME DEFAULT GETDATE()
+    );
+
+        -- Tabella Vessel
+    CREATE TABLE Vessels (
+        VesselId INT PRIMARY KEY IDENTITY(1,1),
+        VesselName NVARCHAR(255)  NULL,
+        YearBuilt DATE  NULL,
+        Capacity INT 
+    );
+
+        -- Tabella Bookings
+    CREATE TABLE Bookings (
+        BookingId INT PRIMARY KEY IDENTITY(1,1),
+        CustomerId INT NULL,  /*referenzia CustomersId*/
+        BookingDate DATETIME,
+        DeparturePort NVARCHAR(255),
+        ArrivalPort NVARCHAR(255),
+        StatusBooking NVARCHAR(255),
+        Notes NVARCHAR(255),
+        FOREIGN KEY (CustomerId) REFERENCES Customers(CustomerId)  ON DELETE no action
+    );
+
+        -- Tabella Shipments
+    CREATE TABLE Shipments (
+        ShipmentsId INT PRIMARY KEY IDENTITY(1,1),
+        BookingId INT UNIQUE NULL,  /**/
+        VesselId INT NULL, /**/
+        BookingDate DATETIME,
+        DepartureDate NVARCHAR(255),
+        ArrivalDate NVARCHAR(255),
+        CargoWeight DECIMAL(18, 2),
+        ShippingCost DECIMAL(18, 2),
+        FOREIGN KEY (VesselId) REFERENCES Vessels(VesselId)  ON DELETE no action,
+        FOREIGN KEY (BookingId) REFERENCES Bookings(BookingId)  ON DELETE no action
+        
+    );
+
+
+    COMMIT TRANSACTION;
+    PRINT 'Tabelle create con successo.';
+END TRY
+BEGIN CATCH
+    ROLLBACK TRANSACTION;
+    PRINT 'Errore durante la creazione delle tabelle:';
+    PRINT ERROR_MESSAGE();
+END CATCH;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
