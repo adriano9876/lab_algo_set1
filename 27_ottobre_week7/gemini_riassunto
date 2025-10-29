@@ -1,0 +1,133 @@
+1. Dati e Database (Capitolo 1)
+Dato: Rappresentazione simbolica di informazione. Se organizzati, sono detti "strutturati".
+Database Relazionale: Il termine "relazionale" si riferisce alla relazione tra intestazione (colonne) e contenuto (record) di una tabella.
+SQL Server: Sistema di gestione di database relazionali (RDBMS) di Microsoft.
+SSMS (SQL Server Management Studio): Ambiente integrato per gestire e interagire con i database SQL Server.
+DDL (Data Definition Language): Usato per creare e modificare le strutture degli oggetti (es. CREATE, ALTER, DROP, TRUNCATE).
+DML (Data Modification Language): Usato per aggiungere, eliminare e modificare i dati (es. SELECT, INSERT, UPDATE, DELETE).
+2. Primi passi nel mondo delle query (Capitolo 2)
+SQL vs T-SQL: SQL è un linguaggio standard; T-SQL è il "dialetto" specifico di Microsoft SQL Server.
+SELECT e FROM: SELECT specifica le colonne, FROM indica la tabella. **SELECT *** è sconsigliato.
+WHERE: Applica una condizione per filtrare le righe.
+ORDER BY: Specifica l'ordine dei risultati (ASC predefinito, DESC per discendente).
+TOP: Limita il numero di righe restituite (anche con PERCENT e WITH TIES).
+Schemi: Metodo per organizzare le tabelle (dbo predefinito). È buona norma specificare sempre lo schema.
+Alias: Nomi alternativi temporanei per colonne e tabelle (spesso con AS). Un alias di colonna non può essere usato nella clausola WHERE.
+DISTINCT: Elimina le righe duplicate.
+NULL: Rappresenta l'assenza di un valore. Si cerca con IS NULL o IS NOT NULL.
+3. Query: uno sguardo più approfondito (Capitolo 3)
+Operatori logici: AND e OR per combinare condizioni nella clausola WHERE.
+IN e NOT IN: Verificano se un valore è presente/assente in un elenco.
+BETWEEN: Seleziona valori all'interno di un intervallo (inclusi gli estremi).
+Gestione dei NULL:
+ISNULL(colonna, valore_sostitutivo): Restituisce il valore sostitutivo se la colonna è NULL.
+COALESCE(val1, val2, ...): Restituisce il primo valore non NULL.
+LIKE: Ricerca di pattern con caratteri jolly (% e _).
+CASE...WHEN: Logica condizionale all'interno di una query. È buona norma includere un ELSE.
+IIF: Funzione T-SQL più semplice per la logica condizionale.
+GROUP BY: Raggruppa le righe con gli stessi valori (usato con funzioni di aggregazione).
+HAVING: Filtra i risultati dopo il raggruppamento.
+Ordine di esecuzione logica: FROM, WHERE, GROUP BY, HAVING, SELECT, ORDER BY.
+4. Tipi di dati e loro manipolazione (Capitolo 4)
+Tipi di Dati: Scelta cruciale per integrità e spazio.
+Stringhe:
+CHAR (lunghezza fissa) vs VARCHAR (lunghezza variabile).
+Unicode (NCHAR/NVARCHAR): Supportano caratteri internazionali (richiedono prefisso N per stringhe letterali).
+Date/Ora: DATETIME (precisione 3.33 ms), DATETIME2 (più preciso).
+Funzioni di Conversione:
+CAST: Funzione standard SQL.
+CONVERT: Specifica di T-SQL, più versatile.
+TRY_CAST / TRY_CONVERT / TRY_PARSE: Restituiscono NULL se la conversione fallisce.
+PARSE: Converte con specificazione di "cultura".
+FORMAT: Converte un valore in una stringa formattata.
+5. Funzioni di SQL Server (Capitolo 5)
+Funzioni per Data e Ora:
+Data corrente: GETDATE(), CURRENT_TIMESTAMP, GETUTCDATE().
+Estrarre parti: DATEPART(), DATENAME().
+Comporre date: DATEFROMPARTS().
+Calcoli: DATEADD(), DATEDIFF().
+Funzioni per Stringhe:
+Concatenazione: Operatore + (NULL se un operando è NULL), CONCAT (tratta NULL come stringhe vuote).
+Estrazione: SUBSTRING(), LEFT(), RIGHT().
+Ricerca: CHARINDEX().
+Lunghezza: LEN() (esclude spazi finali), DATALENGTH() (byte).
+Modifica: REPLACE(), REPLICATE(), STUFF(), UPPER(), LOWER(), LTRIM(), RTRIM().
+Altre Funzioni Utili:
+CHOOSE(indice, val1, val2, ...): Restituisce l'elemento all'indice.
+STRING_AGG(espressione, separatore): Concatena stringhe da più righe.
+STRING_SPLIT(stringa, separatore): Divide una stringa in più righe.
+NULLIF(esp1, esp2): Restituisce NULL se le due espressioni sono uguali.
+6. DDL: Creare e Modificare Oggetti (Capitolo 6)
+CREATE TABLE: Comando per creare una nuova tabella.
+Valori di Default: DEFAULT assegna un valore predefinito.
+Chiave Primaria (Primary Key): Identifica univocamente ogni record. Non può contenere NULL e deve essere unica.
+Chiave Surrogata: Colonna "artificiale" (es. numero intero progressivo).
+IDENTITY(inizio, incremento): Crea una colonna chiave surrogata auto-incrementante. TRUNCATE resetta il contatore, DELETE no.
+Colonne Calcolate: Valore calcolato dalle altre colonne.
+ALTER TABLE: Modifica la struttura di una tabella esistente.
+DROP TABLE: Elimina permanentemente una tabella.
+TRUNCATE TABLE: Rimuove rapidamente tutti i dati da una tabella. È DDL, più veloce di DELETE.
+7. DML: Creare e Modificare Record (Capitolo 7)
+INSERT: Aggiunge nuovi record.
+INSERT VALUES: Inserisce valori specificati manualmente.
+INSERT SELECT: Inserisce i risultati di una query SELECT.
+SET IDENTITY_INSERT ON: Consente l'inserimento esplicito di valori in una colonna IDENTITY.
+UPDATE: Modifica i dati nei record esistenti (usa SET e WHERE). Se WHERE è omesso, aggiorna tutte le righe.
+DELETE: Rimuove i record (usa WHERE). Se WHERE è omesso, elimina tutte le righe.
+Differenze DELETE vs TRUNCATE:
+Log: DELETE registra ogni riga; TRUNCATE registra meno.
+IDENTITY: DELETE non resetta; TRUNCATE resetta.
+Vincoli: TRUNCATE non può essere usato su tabelle referenziate da FOREIGN KEY.
+8. Interrogare più tabelle (Capitolo 8)
+Operatori Set:
+INTERSECT: Righe distinte presenti in entrambi i set.
+EXCEPT: Righe distinte dal primo set non presenti nel secondo.
+JOIN:
+INNER JOIN: Solo righe con corrispondenza in entrambe.
+LEFT JOIN: Tutte le righe della tabella a sinistra e le corrispondenti a destra (NULL se non c'è corrispondenza).
+RIGHT JOIN: Tutte le righe della tabella a destra.
+FULL JOIN: Tutte le righe da entrambe (NULL dove non ci sono corrispondenze).
+CROSS JOIN: Prodotto cartesiano (non richiede ON).
+Subquery: Query annidata all'interno di un'altra.
+Tabelle Derivate (Derived Tables): Subquery temporanea nella clausola FROM.
+Common Table Expressions (CTE): Set di risultati temporaneo nominato (clausola WITH). Migliora la leggibilità.
+CTE Ricorsive: CTE che fa riferimento a sé stessa per dati gerarchici.
+Operatori APPLY:
+CROSS APPLY: Simile a INNER JOIN, esegue subquery per ogni riga esterna.
+OUTER APPLY: Simile a LEFT JOIN, restituisce tutte le righe esterne.
+9. Integrità dei Dati (Capitolo 9)
+Vincoli (Constraints): Regole per garantire accuratezza e affidabilità dei dati.
+Chiave Primaria (PK): Garantisce valore univoco. È buona pratica dare un nome ai vincoli.
+Vincolo UNIQUE: Assicura valori unici, permette un solo valore NULL.
+Chiave Esterna (Foreign Key - FK): Stabilisce relazione tra tabelle per integrità referenziale.
+Vincolo CHECK: Applica una restrizione sui valori basata su una condizione logica.
+Vincolo DEFAULT: Fornisce un valore predefinito.
+10. Uso di SSMS (Capitolo 10)
+Operazioni Grafiche: Quasi tutte le operazioni DDL possono essere eseguite graficamente in SSMS.
+Creare Database: Clic destro su "Database" -> "New database".
+Creare Tabelle: Clic destro su "Tables" -> "New > Table".
+Modificare Tabelle: Clic destro su una tabella esistente -> "Design".
+Svantaggi: L'uso del designer grafico è sconsigliato per il controllo sui nomi dei vincoli o sullo schema.
+11. Le Viste (Views) (Capitolo 11)
+Cosa sono: Oggetto di database che rappresenta una query SELECT memorizzata. Agisce come una tabella virtuale.
+Scopo: Semplificare query complesse e aumentare la sicurezza.
+Creazione: CREATE VIEW NomeVista AS ....
+WITH SCHEMABINDING: Lega la vista allo schema delle tabelle sottostanti, impedendo modifiche strutturali.
+UPDATE su Viste: Possibile ma sconsigliato; impedito su viste complesse.
+WITH CHECK OPTION: Impedisce INSERT/UPDATE se la riga non soddisfa più la clausola WHERE della vista.
+Restrizioni: Le viste non possono contenere ORDER BY nella loro definizione.
+Modifica ed Eliminazione: ALTER VIEW e DROP VIEW. L'eliminazione di una vista non ha effetto sui dati delle tabelle sottostanti.
+12. Query Avanzate (Capitolo 12)
+DML con JOIN:
+UPDATE ... FROM ... JOIN: Aggiorna una tabella basandosi su dati di un'altra tabella unita.
+DELETE ... FROM ... JOIN: Elimina righe da una tabella basandosi su condizioni di una tabella unita.
+PIVOT: Trasforma i dati da righe a colonne (richiede funzione di aggregazione e FOR).
+UNPIVOT: Operazione inversa di PIVOT.
+Usi avanzati di MIN/MAX: Su valori scalari, su più colonne (con VALUES), senza GROUP BY (con funzioni finestra).
+MERGE: Esegue INSERT, UPDATE e DELETE in un unico comando per sincronizzare tabelle (WHEN MATCHED, WHEN NOT MATCHED).
+13. Funzioni Utili (Capitolo 13)
+Funzioni di Rango (Window Functions): Assegnano un numero sequenziale alle righe in base a un ordinamento.
+ROW_NUMBER(): Numero sequenziale unico (non gestisce i pareggi).
+RANK(): Stesso rango ai valori uguali, lascia "buchi" nella sequenza.
+DENSE_RANK(): Stesso rango ai pareggi, non lascia "buchi".
+PARTITION BY: Divide il set di risultati in "partizioni" per le funzioni di rango.
