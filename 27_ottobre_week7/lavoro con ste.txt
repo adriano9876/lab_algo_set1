@@ -1,0 +1,90 @@
+using Microsoft.EntityFrameworkCore;
+using SqlAndEf.CodeFirst.BusinessLogic.Models;
+using SqlAndEf.CodeFirst.DataAccess.Models;
+ 
+namespace SqlAndEf.CodeFirst.BusinessLogic.Services.Impl;
+ 
+public class TrackAuthorService : ITrackAuthorService
+{
+    private readonly SongDbContext _context;
+ 
+    public TrackAuthorService(SongDbContext context)
+    {
+        _context = context;
+    }
+ 
+    // TODO: Implementare i metodi usando Entity Framework Core
+ 
+    public async Task<List<TrackAuthorDto>> GetAllTrackAuthorsAsync()
+    {
+        var artist = await _context.Artists.Include(t => t.Tracks).Select(a => new Artist
+        {
+            Id = a.Id,
+            Name = a.Name,
+            Tracks = a.Tracks.Select(t => new Track
+            {
+                Id = t.Id,
+                Title = t.Title,
+            })
+        //}).Select(a => {
+        //    List<(string, string, int, int)> listaTuple = new();
+        //    foreach (var tmp_tracks in a.Tracks)
+        //    {
+        //        listaTuple.Add((a.Name, tmp_tracks.Title, a.Id, tmp_tracks.Id));
+        //    }
+        }).ToListAsync();
+ 
+        List<(string, string, int, int)> listaTuple = new();
+ 
+        foreach (var a in artist)
+        {
+            var artistScope = a;
+            foreach (var t in a.Tracks)
+            {
+                listaTuple.Add((t.Title, a.Name, t.Id, a.Id));
+            }
+        }
+ 
+        var dto = listaTuple.Select(x => new TrackAuthorDto
+        {
+ 
+            ArtistId = x.Item4,
+            ArtistName = x.Item2,
+            TrackId = x.Item3,
+            TrackTitle = x.Item1
+        }).ToList();
+ 
+        return dto;
+            //var a = new TrackAuthorDto
+            //{
+            //     ArtistId = artist.Id,
+ 
+            //}
+    }
+ 
+    public Task<TrackAuthorDto> GetTrackAuthorByIdAsync(int id)
+    {
+        throw new NotImplementedException();
+    }
+ 
+    public async Task<TrackAuthorDto> CreateTrackAuthorAsync(TrackAuthorDto trackAuthor)
+    {
+        var artist = await _context.Artists.Include(t => t.Tracks).Add(new Artist
+        {
+        });
+ 
+    public Task<bool> DeleteTrackAuthorAsync(int id)
+    {
+        throw new NotImplementedException();
+    }
+ 
+    public Task<List<TrackAuthorDto>> GetAuthorsByTrackAsync(int trackId)
+    {
+        throw new NotImplementedException();
+    }
+ 
+    public Task<List<TrackAuthorDto>> GetTracksByArtistAsync(int artistId)
+    {
+        throw new NotImplementedException();
+    }
+}
