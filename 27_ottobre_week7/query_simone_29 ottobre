@@ -186,7 +186,22 @@ order by dif_anni desc
 
 
 
-
+/*giacomo dati */
+SELECT t.TrackTitle
+FROM music.Tracks t
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM music.TrackAuthors ta
+    INNER JOIN (
+        SELECT a.ArtistId
+        FROM music.Artists a
+        INNER JOIN music.TrackAuthors tr ON tr.ArtistId = a.ArtistId
+        GROUP BY a.ArtistId
+        HAVING COUNT(tr.TrackId) < 10
+    ) fewTracks ON fewTracks.ArtistId = ta.ArtistId
+    WHERE ta.TrackId = t.TrackId
+)
+ORDER BY t.TrackTitle;
 
 
 
