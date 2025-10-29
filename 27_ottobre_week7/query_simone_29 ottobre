@@ -1,0 +1,222 @@
+--/* primi 10 album  che hanno almeno un brano con genere dance pop*/
+
+--select distinct top (100)  AlbumTitle, GenreName
+--from  music.Tracks t join music.Genres g on t.GenreId = g.GenreId join music.Albums a on a.AlbumId
+--= t.AlbumId
+--where g.GenreName like 'dance pop'
+--order by AlbumTitle asc
+
+--/* primi 10 album  che hanno almeno 3 traccie brano con genere dance pop*/
+
+--select distinct top (100)  AlbumTitle, GenreName, count(1) as quantita
+--from  music.Tracks t join music.Genres g on t.GenreId = g.GenreId join music.Albums a on a.AlbumId
+--= t.AlbumId
+--where g.GenreName like 'dance pop'
+--group by GenreName,AlbumTitle
+--having COUNT(1) >3 
+--order by AlbumTitle asc
+
+
+--/*tutte le cansoni genere  k pop con i suoi nome autore e traccia */
+
+--select top (100)TrackTitle,ArtistName, GenreName
+--from music.Artists a join music.TrackAuthors ta on a.ArtistId = ta.ArtistId 
+--	join music.Tracks t on ta.TrackId=t.TrackId
+--	join music.Genres g on g.GenreId = t.GenreId
+--where g.GenreName like '%rock%'
+--order by TrackTitle asc
+
+
+--/*artisti che hanno scritto piu di 3 traccie in generi diversi  ver 1*/
+
+--select distinct   ArtistName,GenreName,count(1) as quantita 
+--from music.Artists a join music.TrackAuthors ta on a.ArtistId = ta.ArtistId 
+--	join music.Tracks t on ta.TrackId=t.TrackId
+--	join music.Genres g on g.GenreId = t.GenreId
+--group by a.ArtistId,ArtistName,GenreName 
+--having COUNT(1) >3
+--order by ArtistName asc
+
+
+--/*artisti che hanno scritto piu di 3 traccie in generi diversi  ver 2*/
+
+--with cte_finale as (
+--select distinct a.ArtistId,ArtistName,GenreName ,count(1) as quantitaTraccie 
+--from music.Artists a join music.TrackAuthors ta on a.ArtistId = ta.ArtistId 
+--	join music.Tracks t on ta.TrackId=t.TrackId
+--	join music.Genres g on g.GenreId = t.GenreId
+--group by a.ArtistId,ArtistName,GenreName 
+--having COUNT(1) > 3)
+ 
+-- select *
+-- from cte_finale
+
+
+
+
+----select distinct   ArtistName,GenreName,count(1) as quantita 
+----from music.Artists a join music.TrackAuthors ta on a.ArtistId = ta.ArtistId 
+----	join music.Tracks t on ta.TrackId=t.TrackId
+----	join music.Genres g on g.GenreId = t.GenreId
+----group by a.ArtistId,ArtistName,GenreName 
+----having COUNT(1) >3
+----order by ArtistName asc
+
+
+
+
+--/* per ogni anno l'album che ha piu canzoni*/
+
+--select a.AlbumId,a.AlbumTitle
+--from music.Albums a join music.Tracks t on t.AlbumId = a.AlbumId 
+--group by a.AlbumId,a.AlbumTitle
+
+--/* trovare la media degli anni di rilascio degli album che contengono un
+--winter nel loro titolo */
+
+
+--select *, isnull ((cast (a.ReleaseYear as varchar)) ,'NULL') as new_nameYear
+--from  music.Albums a 
+--where a.AlbumTitle like '%winter%'
+
+
+
+/*  TUTTE LE TRACCE DI CUI TUTTI GLI AUTORI HANNO PUBLICATO 10 O PIU TRACCIE 
+se ci sono artitsti che hanno scritto piu traccie anche questi devono avere >10
+*/
+with cte_artisti_min_10 as (
+	select distinct ArtistId as artista_id,COUNT(1) quantita
+	from music.TrackAuthors
+	group by ArtistId
+	having COUNT(1)<10
+)
+select distinct t.TrackId, t.TrackTitle
+from music.Artists a join music.TrackAuthors ta on a.ArtistId = ta.ArtistId 
+	join music.Tracks t on ta.TrackId=t.TrackId
+where a.ArtistId not in (select artista_id
+						from cte_artisti_min_10)
+
+
+
+
+--with cte_artisti_min_10 as (
+--	select distinct ArtistId as artista_id,COUNT(1) quantita
+--	from music.TrackAuthors
+--	group by ArtistId
+--	having COUNT(1)<10
+--)
+--select *
+--from cte_artisti_min_10 cte join 
+
+
+
+
+/*
+
+trova tutte le tracce di album usciti prima del 2000
+includi una colonna "Nota" così popolata:
+se una traccia è uscita dopo il 1990 scrivi "recente"
+se è uscita tra il 1980 e il 1990 (compreso) scrivi "meno recente"
+per tutte le altre scrivi "vetusta" 
+
+CASE
+WHEN ProductType = 'Electronics' OR ProductType = 'Gadgets' THEN 'Technology'
+WHEN ProductType = 'Clothing' OR ProductType = 'Accessories' THEN 'Fashion'
+ELSE 'Other'
+END */
+ select TrackTitle,AlbumTitle,
+ case
+		when (a.ReleaseYear>1990) then 'recente'
+		when (a.ReleaseYear>1980 and a.ReleaseYear <1990 ) then 'meno recente'
+		else 'vetusta'
+	end as risultato
+ from music.Tracks t join music.Albums a on t.AlbumId = a.AlbumId 
+ where a.ReleaseYear <=2000
+ 
+/* trova i 5 album con durata complessiva più lunga */  
+select  top (5) a.AlbumId ,a.AlbumTitle, sum(t.Duration) durata_album
+from music.Albums a join music.Tracks t on a.AlbumId  = t.AlbumId
+group by a.AlbumId,a.AlbumTitle
+order by durata_album desc
+
+/*trova tutte le tracce con almeno 2 artisti i cui nomi hanno la stessa iniziale */
+with cte_n_nomi as(
+	select ArtistId ,ArtistName, SUBSTRING(ArtistName, 1, 1) AS ExtractString
+	from music.Artists )
+select *
+from cte_n_nomi c1 join cte_n_nomi c2 on c1.
+
+
+--trova il genere musicale con più tracce nel db
+;select top (1)g.GenreId,g.GenreName ,COUNT(g.GenreId) numero_tracce
+from music.Genres g join music.Tracks t on  g.GenreId = t.GenreId
+group by g.GenreId,g.GenreName
+order by numero_tracce desc
+
+--trova l'artista che ha lavorato a più generi diversi
+
+select  a.ArtistId,a.ArtistName,g.GenreId,g.GenreName,count (g.GenreId) quanita_generi
+from music.Artists a join music.TrackAuthors ta on a.ArtistId = ta.ArtistId
+	join music.Tracks t on t.TrackId = ta.TrackId
+	join music.Genres g on g.GenreId = t.GenreId
+group by a.ArtistId,a.ArtistName,g.GenreId,g.GenreName
+order by a.ArtistId,a.ArtistName,g.GenreId,g.GenreName
+
+
+
+--trova l'artista che ha scritto più canzoni di uno stesso genere
+
+select  a.ArtistId,a.ArtistName, g.GenreId,count (g.GenreId) quanita_generi
+from music.Artists a join music.TrackAuthors ta on a.ArtistId = ta.ArtistId
+	join music.Tracks t on t.TrackId = ta.TrackId
+	join music.Genres g on g.GenreId = t.GenreId
+group by a.ArtistId,a.ArtistName, g.GenreId
+
+
+-- trova i primi 10 artisti che hanno pubblicato canzoni con più anni di differenza 
+-- tra la prima e l'ultima
+ 
+ select distinct top (10) a.ArtistId ,a.ArtistName, max(alb.ReleaseYear) - min (alb.ReleaseYear) as dif_anni
+ from music.Artists a join music.TrackAuthors ta on a.ArtistId = ta.ArtistId
+	join music.Tracks t on t.TrackId = ta.TrackId
+	join music.Albums alb on alb.AlbumId = T.AlbumId 
+GROUP BY a.ArtistId ,a.ArtistName
+order by dif_anni desc
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
