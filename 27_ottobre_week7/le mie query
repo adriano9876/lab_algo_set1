@@ -1,0 +1,157 @@
+
+
+
+--1) Trova tutti gli album usciti prima del 2010
+select a.AlbumId, a.AlbumTitle, a.ReleaseYear
+from music.Albums a
+where a.ReleaseYear < 2010
+ 
+--2) Trova i 5 album con durata complessiva più lunga
+
+select top (5) a.AlbumId, a.AlbumId , sum (t.Duration) as durataSum
+from music.Tracks t join music.Albums a on t.AlbumId = a.AlbumId
+group by a.AlbumId, a.AlbumId
+order by durataSum desc
+ 
+--3) Trova tutte le tracce con almeno 2 artisti i cui nomi hanno la stessa 
+--iniziale ????
+;with cte_lettera as(
+	select t.TrackId,ta.ArtistId,ArtistName , SUBSTRING(a.ArtistName, 1, 1) AS inizialiLettere
+	from music.Tracks t join music.TrackAuthors ta on ta.TrackId = t.TrackId  
+		join music.Artists a on a.ArtistId = ta.ArtistId 
+)
+select t.TrackId,t.TrackTitle,c.ArtistName , inizialiLettere
+from  cte_lettera c join music.Tracks t on c.TrackId = t.TrackId
+
+ 
+--4) Conta quanti album sono stati pubblicati tra il 2015 e il 2020 e hanno un titolo che 
+-- inizia per 'A' o 'T'
+
+select count(a.AlbumId) quantita 
+from music.Albums a
+where a.ReleaseYear>=2015 and a.ReleaseYear<=2020 and (a.AlbumTitle like 'a%' or a.AlbumTitle like 't%' )
+ 
+--5) Trova i primi tre generi musicali con più tracce. In caso di parità, ordina per nome del
+--genere in ordine alfabetico
+select distinct top(3) g.GenreId,g.GenreName,COUNT(1) quantita
+from music.Tracks t join music.Genres g on g.GenreId= t.GenreId 
+group by g.GenreId,g.GenreName 
+order by quantita desc ;
+
+ 
+--6) Trova tutte le tracce che hanno più di un autore, mostrando il titolo della traccia e 
+--l'elenco degli artisti separati da " - "  ????
+;with cte_elenco as (
+	select t.TrackId , COUNT(ta.ArtistId) quanita
+	from music.Tracks t join music.TrackAuthors ta on ta.TrackId = t.TrackId
+	group by t.TrackId 
+	having COUNT(ta.ArtistId)>1
+)
+select *
+from cte_elenco c join music.TrackAuthors ta on ta.TrackId = c.TrackId
+	join music.Artists a on a.ArtistId = ta.ArtistId
+
+ 
+--7) Trova i primi 10 album con la durata media delle tracce più alta
+select top (10 )a.AlbumId,a.AlbumTitle, avg (t.Duration) durata_avg
+from music.Albums a join music.Tracks t on t.AlbumId = a.AlbumId
+group by a.AlbumId,a.AlbumTitle
+order by durata_avg desc
+ 
+--8) Trova tutti gli artisti che hanno collaborato con almeno 3 altri artisti diversi 
+-- (cioè hanno scritto tracce insieme ad almeno 3 artisti diversi) ???
+
+--9) Trova la traccia più lunga per ogni genere musicale
+;with cte_massimo as (
+	select g.GenreId,g.GenreName, max(t.Duration) max_durata
+	from music.Tracks t join music.Genres g on g.GenreId = t.GenreId
+	group by g.GenreId,g.GenreName
+)
+select t.TrackTitle,c.GenreName, t.Duration durata
+from cte_massimo c join music.Tracks t on c.max_durata = t.Duration 
+order by Duration desc
+ 
+--10) Trova tutti gli album che contengono tracce di almeno 3 generi diversi
+
+select a.AlbumId,a.AlbumTitle,COUNT (g.GenreId) quantita_generi
+from music.Albums a join music.Tracks t on t.AlbumId = a.AlbumId
+	join music.Genres g on g.GenreId = t.GenreId
+group by a.AlbumId,a.AlbumTitle
+having COUNT (g.GenreId)>=3
+order by quantita_generi desc
+ 
+--11) Trova il genere musicale con la durata totale maggiore di tutte le sue tracce
+select top (1) g.GenreId,g.GenreName,sum(t.Duration) somma
+from music.Genres g join music.Tracks t on t.GenreId = g.GenreId 
+group by g.GenreId,g.GenreName
+
+ 
+--12) Trova tutti gli album pubblicati negli anni '90 che hanno almeno una traccia di durata
+--superiore a 5 minuti (300000 millisecondi)
+
+select distinct a.AlbumId,a.AlbumTitle
+from music.Albums a join music.Tracks t on t.AlbumId= a.AlbumId 
+where a.ReleaseYear >= 1990 and a.ReleaseYear <2000 and t.Duration > 300000
+
+ 
+--13) Trova gli artisti che hanno scritto tracce in esattamente 2 generi diversi
+select distinct a.ArtistId,a.ArtistName , COUNT (distinct g.GenreId) quantita_generi
+from music.Artists a 
+	join music.TrackAuthors ta on ta.ArtistId = a.ArtistId
+	join music.Tracks t on t.TrackId = ta.TrackId
+	join music.Genres g on g.GenreId = t.GenreId
+group by a.ArtistId,a.ArtistName 
+having  COUNT (distinct g.GenreId) = 2
+ 
+--14) Trova l'album con il maggior numero di tracce. In caso di parità, mostra quello 
+--uscito più recentemente
+
+select  a.AlbumId,a.AlbumTitle, count (t.TrackId) numero_traccie
+from music.Albums a join music.Tracks t on t.AlbumId = a.AlbumId
+group by a.AlbumId,a.AlbumTitle
+order by numero_traccie desc
+
+--15) Trova tutte le tracce il cui titolo contiene la parola "love" o "life" (case insensitive)
+select * 
+from music.Tracks t
+where t.TrackTitle like '%love%' or t.TrackTitle like '%life%'
+
+ 
+--16) Trova il decennio (es. 1980, 1990, 2000, 2010) con il maggior numero di album pubblicati
+
+
+ 
+--17) Trova tutti gli artisti che hanno scritto sia tracce di genere 'pop' che di genere 'rock'
+;select *
+from music.Artists a 
+	join music.TrackAuthors ta on ta.ArtistId = a.ArtistId
+	join music.Tracks t on t.TrackId = ta.TrackId
+	join music.Genres g on g.GenreId = t.GenreId
+where g.GenreName like '%pop%' or g.GenreName like '%rock%'
+
+ 
+--18) Trova la durata media delle tracce per ogni anno di pubblicazione dell'album,
+--considerando solo gli album pubblicati dopo il 2000
+ 
+--19) Trova tutti i generi che non hanno tracce in album usciti prima del 1995
+select *
+from 
+ 
+--20) Trova le 3 coppie di artisti che hanno collaborato insieme al maggior numero di tracce
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
