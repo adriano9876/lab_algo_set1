@@ -174,3 +174,9 @@ ELSE BEGIN
 	PRINT 'The database update failed';
 END;
 GO
+
+
+
+INSERT INTO [music].[TrackAuthors] ([TrackId], [ArtistId]) VALUES (18983, 150)
+INSERT INTO [music].[TrackAuthors] ([TrackId], [ArtistId]) VALUES (18983, 700)
+INSERT INTO [music].[TrackAuthors] ([TrackId], [ArtistId]) VALUES (18936, 680)
