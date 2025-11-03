@@ -1,0 +1,19 @@
+DELETE ta
+FROM music.TrackAuthors ta
+ LEFT JOIN music.Artists a
+  ON ta.ArtistId = a.ArtistId
+ LEFT JOIN music.Tracks t
+  ON t.TrackId = ta.TrackId
+WHERE a.ArtistId IS NULL
+   OR t.TrackId IS NULL;
+
+
+
+DELETE pt
+FROM usercontent.PlaylistTracks pt
+ LEFT JOIN music.Tracks t
+  ON t.TrackId = pt.TrackId
+WHERE t.TrackId IS NULL;
+
+
+DELETE l
