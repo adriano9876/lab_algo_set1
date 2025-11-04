@@ -1,0 +1,724 @@
+/*m*/
+
+using ExamProject.Data;
+using ExamProject.Dtos;
+using ExamProject.Models;
+using ExamProject.Requests;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+namespace ExamProject.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class StoreController : ControllerBase
+{
+    private readonly AppDbContext _context;
+
+    public StoreController(AppDbContext context)
+    {
+        _context = context;
+    }
+
+    // -----------------------------------------------------------------
+    // TASK 2.1: GetProductById (10 Points)
+    // Implement this method
+    // -----------------------------------------------------------------
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Product>> GetProductById(int id)
+    {
+        // STUDENT TODO:
+        // 1. Find the product by id.
+        // 2. Use Eager Loading (Include/ThenInclude) to load Category AND Tags.
+        // 3. If not found, return NotFound().
+        // 4. Return the product.
+
+        var product = await _context.Products
+            .AsNoTracking()
+            .Include(p => p.Category)
+            .Include(p => p.ProductTags).ThenInclude(pt => pt.Tag)
+            //.Select(x => new ProductDto           // ALTERNATIVA CON DTO MA MATERIALIZZA I TAGS
+            //{
+            //    ProductId = x.ProductId,
+            //    Name = x.Name,
+            //    Description = x.Description,
+            //    Price = x.Price,
+            //    DateAdded = x.DateAdded,
+            //    IsAvailable = x.IsAvailable,
+            //    CategoryId = x.CategoryId,
+            //    Category = new CategoryDto
+            //    {
+            //        CategoryId = x.CategoryId,
+            //        Name = x.Category.Name,
+            //        ProductCount = x.Category.Products.Count()
+            //    },
+            //    Tags = x.ProductTags.Select(pt => new TagDto
+            //    {
+            //        TagId = pt.TagId,
+            //        Name = pt.Tag.Name
+            //    }).ToList()
+            //})
+            .SingleOrDefaultAsync(x => x.ProductId == id);
+
+        if (product == null) return NotFound();
+
+        return product;
+    }
+
+    // -----------------------------------------------------------------
+    // TASK 2.2: SearchProducts (10 Points)
+    // Implement this method
+    // -----------------------------------------------------------------
+    [HttpGet("search")]
+    public async Task<ActionResult<IEnumerable<Product>>> SearchProducts(
+        [FromQuery] string? searchTerm,
+        [FromQuery] decimal? minPrice)
+    {
+        // STUDENT TODO:
+        // 1. Start with IQueryable: var query = _context.Products.AsQueryable();
+        // 2. If searchTerm is provided, add a .Where() clause to check Name OR Description.
+        // 3. If minPrice is provided, add a .Where() clause to check Price.
+        // 4. Use .AsNoTracking() for optimization.
+        // 5. Execute the query with .ToListAsync() and return the results.
+        var query = _context.Products.AsNoTracking().AsQueryable();
+
+        if(searchTerm != null)
+        {
+            query = query.Where(x => x.Name.Contains(searchTerm) || x.Description.Contains(searchTerm));
+        }
+
+        if(minPrice != null)
+        {
+            query = query.Where(x => x.Price >= minPrice);
+        }
+
+         var products = await query.Include(p => p.Category)
+            .Include(p => p.ProductTags).ThenInclude(pt => pt.Tag)
+            //.Select(x => new ProductDto               // ALTERNATIVA CON DTO MA MATERIALIZZA I TAGS
+            //{
+            //    ProductId = x.ProductId,
+            //    Name = x.Name,
+            //    Description = x.Description,
+            //    Price = x.Price,
+            //    DateAdded = x.DateAdded,
+            //    IsAvailable = x.IsAvailable,
+            //    CategoryId = x.CategoryId,
+            //    Category = new CategoryDto
+            //    {
+            //        CategoryId = x.CategoryId,
+            //        Name = x.Category.Name,
+            //        ProductCount = x.Category.Products.Count()
+            //    },
+            //    Tags = x.ProductTags.Select(pt => new TagDto
+            //    {
+            //        TagId = pt.TagId,
+            //        Name = pt.Tag.Name
+            //    }).ToList()
+            //})
+            .ToListAsync();
+
+        return products;
+    }
+
+    // -----------------------------------------------------------------
+    // TASK 2.3: GetCategoryStatistics (10 Points)
+    // Implement this method
+    // -----------------------------------------------------------------
+    [HttpGet("statistics")]
+    public async Task<IActionResult> GetCategoryStatistics()
+    {
+        // STUDENT TODO:
+        // 1. Query the Categories.
+        // 2. Use .Select() to project the results into a new anonymous object (or DTO).
+        // 3. The new object should have:
+        //    - CategoryName (from category.Name)
+        //    - ProductCount (using category.Products.Count())
+        // 4. Execute and return the list.
+
+        var categories = _context.Categories.AsNoTracking()
+            .Select(x => new 
+            {
+                Name = x.Name,
+                ProductCount = x.Products.Count()
+            });
+
+        return Ok(await categories.ToListAsync());
+    }
+
+    // -----------------------------------------------------------------
+    // TASK 3: CreateProduct (15 Points)
+    // Implement this method
+    // -----------------------------------------------------------------
+    [HttpPost]
+    public async Task<ActionResult<Product>> CreateProduct(UpsertProductRequest product)
+    {
+        // STUDENT TODO:
+        // 1. Add the 'product' entity to the DbContext.
+        // 2. Save the changes to the database.
+        // 3. Return a 201 Created response using CreatedAtAction.
+        //    Hint: nameof(GetProductById)
+        var c = await _context.Categories.SingleAsync(x => x.CategoryId == product.CategoryId);
+        if (c == null)
+        {
+            return BadRequest($"Category with ID {product.CategoryId} does not exists");
+        }
+
+        var p = new Product       // posso creare una request per creare il prodotto anziché passare il prodotto
+        {
+            Name = product.Name,
+            Description = product.Description,
+            Price = product.Price,
+            DateAdded = DateTime.UtcNow,
+            IsAvailable = product.IsAvailable,
+            CategoryId = product.CategoryId
+        };
+
+        _context.Products.Add(p);
+
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetProductById), new { id = p.ProductId }, p);
+    }
+}
+
+
+/*g*/
+using ExamProject.Data;
+using ExamProject.Dtos;
+using ExamProject.Models;
+using ExamProject.Requests;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+namespace ExamProject.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class StoreController : ControllerBase
+{
+    private readonly AppDbContext _context;
+
+    public StoreController(AppDbContext context)
+    {
+        _context = context;
+    }
+
+    // -----------------------------------------------------------------
+    // TASK 2.1: GetProductById (10 Points)
+    // Implement this method
+    // -----------------------------------------------------------------
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Product>> GetProductById(int id)
+    {
+        // STUDENT TODO:
+        // 1. Find the product by id.
+        // 2. Use Eager Loading (Include/ThenInclude) to load Category AND Tags.
+        // 3. If not found, return NotFound().
+        // 4. Return the product.
+
+        var product = await _context.Products
+            .AsNoTracking()
+            .Include(p => p.Category)
+            .Include(p => p.ProductTags).ThenInclude(pt => pt.Tag)
+            //.Select(x => new ProductDto           // ALTERNATIVA CON DTO MA MATERIALIZZA I TAGS
+            //{
+            //    ProductId = x.ProductId,
+            //    Name = x.Name,
+            //    Description = x.Description,
+            //    Price = x.Price,
+            //    DateAdded = x.DateAdded,
+            //    IsAvailable = x.IsAvailable,
+            //    CategoryId = x.CategoryId,
+            //    Category = new CategoryDto
+            //    {
+            //        CategoryId = x.CategoryId,
+            //        Name = x.Category.Name,
+            //        ProductCount = x.Category.Products.Count()
+            //    },
+            //    Tags = x.ProductTags.Select(pt => new TagDto
+            //    {
+            //        TagId = pt.TagId,
+            //        Name = pt.Tag.Name
+            //    }).ToList()
+            //})
+            .SingleOrDefaultAsync(x => x.ProductId == id);
+
+        if (product == null) return NotFound();
+
+        return product;
+    }
+
+    // -----------------------------------------------------------------
+    // TASK 2.2: SearchProducts (10 Points)
+    // Implement this method
+    // -----------------------------------------------------------------
+    [HttpGet("search")]
+    public async Task<ActionResult<IEnumerable<Product>>> SearchProducts(
+        [FromQuery] string? searchTerm,
+        [FromQuery] decimal? minPrice)
+    {
+        // STUDENT TODO:
+        // 1. Start with IQueryable: var query = _context.Products.AsQueryable();
+        // 2. If searchTerm is provided, add a .Where() clause to check Name OR Description.
+        // 3. If minPrice is provided, add a .Where() clause to check Price.
+        // 4. Use .AsNoTracking() for optimization.
+        // 5. Execute the query with .ToListAsync() and return the results.
+        var query = _context.Products.AsNoTracking().AsQueryable();
+
+        if(searchTerm != null)
+        {
+            query = query.Where(x => x.Name.Contains(searchTerm) || x.Description.Contains(searchTerm));
+        }
+
+        if(minPrice != null)
+        {
+            query = query.Where(x => x.Price >= minPrice);
+        }
+
+         var products = await query.Include(p => p.Category)
+            .Include(p => p.ProductTags).ThenInclude(pt => pt.Tag)
+            //.Select(x => new ProductDto               // ALTERNATIVA CON DTO MA MATERIALIZZA I TAGS
+            //{
+            //    ProductId = x.ProductId,
+            //    Name = x.Name,
+            //    Description = x.Description,
+            //    Price = x.Price,
+            //    DateAdded = x.DateAdded,
+            //    IsAvailable = x.IsAvailable,
+            //    CategoryId = x.CategoryId,
+            //    Category = new CategoryDto
+            //    {
+            //        CategoryId = x.CategoryId,
+            //        Name = x.Category.Name,
+            //        ProductCount = x.Category.Products.Count()
+            //    },
+            //    Tags = x.ProductTags.Select(pt => new TagDto
+            //    {
+            //        TagId = pt.TagId,
+            //        Name = pt.Tag.Name
+            //    }).ToList()
+            //})
+            .ToListAsync();
+
+        return products;
+    }
+
+    // -----------------------------------------------------------------
+    // TASK 2.3: GetCategoryStatistics (10 Points)
+    // Implement this method
+    // -----------------------------------------------------------------
+    [HttpGet("statistics")]
+    public async Task<IActionResult> GetCategoryStatistics()
+    {
+        // STUDENT TODO:
+        // 1. Query the Categories.
+        // 2. Use .Select() to project the results into a new anonymous object (or DTO).
+        // 3. The new object should have:
+        //    - CategoryName (from category.Name)
+        //    - ProductCount (using category.Products.Count())
+        // 4. Execute and return the list.
+
+        var categories = _context.Categories.AsNoTracking()
+            .Select(x => new 
+            {
+                Name = x.Name,
+                ProductCount = x.Products.Count()
+            });
+
+        return Ok(await categories.ToListAsync());
+    }
+
+    // -----------------------------------------------------------------
+    // TASK 3: CreateProduct (15 Points)
+    // Implement this method
+    // -----------------------------------------------------------------
+    [HttpPost]
+    public async Task<ActionResult<Product>> CreateProduct(UpsertProductRequest product)
+    {
+        // STUDENT TODO:
+        // 1. Add the 'product' entity to the DbContext.
+        // 2. Save the changes to the database.
+        // 3. Return a 201 Created response using CreatedAtAction.
+        //    Hint: nameof(GetProductById)
+        var c = await _context.Categories.SingleAsync(x => x.CategoryId == product.CategoryId);
+        if (c == null)
+        {
+            return BadRequest($"Category with ID {product.CategoryId} does not exists");
+        }
+
+        var p = new Product       // posso creare una request per creare il prodotto anziché passare il prodotto
+        {
+            Name = product.Name,
+            Description = product.Description,
+            Price = product.Price,
+            DateAdded = DateTime.UtcNow,
+            IsAvailable = product.IsAvailable,
+            CategoryId = product.CategoryId
+        };
+
+        _context.Products.Add(p);
+
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetProductById), new { id = p.ProductId }, p);
+    }
+}
+
+/*g2*/
+
+
+using ExamProject.Data;
+using ExamProject.Models;
+
+using ExamProject.Models.Request;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+
+namespace ExamProject.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class StoreController : ControllerBase
+{
+    private readonly AppDbContext _context;
+
+    public StoreController(AppDbContext context)
+    {
+        _context = context;
+    }
+
+    // -----------------------------------------------------------------
+    // TASK 2.1: GetProductById (10 Points)
+    // Implement this method
+    // -----------------------------------------------------------------
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Product>> GetProductById(int id)
+    {
+        // STUDENT TODO:
+        // 1. Find the product by id.
+        // 2. Use Eager Loading (Include/ThenInclude) to load Category AND Tags.
+        // 3. If not found, return NotFound().
+        // 4. Return the product.
+        var product = await _context.Products.AsNoTracking()
+            .Include(w => w.ProductTags)
+            .ThenInclude(w => w.Tag)
+            .Include(w => w.Category)
+            .SingleOrDefaultAsync(w => w.ProductId == id);
+
+        if (product == null) { return NotFound(); }
+        return Ok(product);
+
+
+    }
+
+    // -----------------------------------------------------------------
+    // TASK 2.2: SearchProducts (10 Points)
+    // Implement this method
+    // -----------------------------------------------------------------
+    [HttpGet("search")]
+    public async Task<ActionResult<IEnumerable<Product>>> SearchProducts(
+        [FromQuery] string? searchTerm,
+        [FromQuery] decimal? minPrice)
+    {
+        var query = _context.Products.AsQueryable();
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            query = query.Where(p => p.Name.Contains(searchTerm) ||
+                                     p.Description.Contains(searchTerm));
+        }
+
+
+        if (minPrice.HasValue)
+        {
+            query = query.Where(p => p.Price >= minPrice.Value);
+        }
+
+
+        query = query.AsNoTracking();
+
+        var products = await query.ToListAsync();
+
+        return Ok(products);
+    }
+
+    // -----------------------------------------------------------------
+    // TASK 2.3: GetCategoryStatistics (10 Points)
+    // Implement this method
+    // -----------------------------------------------------------------
+    [HttpGet("statistics")]
+    public async Task<IActionResult> GetCategoryStatistics()
+    {
+        // STUDENT TODO:
+        // 1. Query the Categories.
+        // 2. Use .Select() to project the results into a new anonymous object (or DTO).
+        // 3. The new object should have:
+        //    - CategoryName (from category.Name)
+        //    - ProductCount (using category.Products.Count())
+        // 4. Execute and return the list.
+        var categories = _context.Categories
+          .AsNoTracking()
+          .Select(a => new
+          {
+              Name = a.Name,
+              ProductCount = a.Products.Count()
+
+
+
+          });
+        var tolist = await categories.ToListAsync();
+        return Ok(tolist);
+
+
+    }
+
+    // -----------------------------------------------------------------
+    // TASK 3: CreateProduct (15 Points)
+    // Implement this method
+    // -----------------------------------------------------------------
+    [HttpPost]
+    public async Task<ActionResult<Product>> CreateProduct(CreateProductRequest product)
+    {
+        // STUDENT TODO:
+        // 1. Add the 'product' entity to the DbContext.
+        // 2. Save the changes to the database.
+        // 3. Return a 201 Created response using CreatedAtAction.
+        //    Hint: nameof(GetProductById)_
+        if( await _context.Categories.SingleAsync(a=>a.CategoryId==product.CategoryId) == null) { return BadRequest("Categoria non trovata"); }
+        var producttoadd = new Product
+        {
+            CategoryId = product.CategoryId,
+            Name = product.Name,
+            Description = product.Description,
+            Price = product.Price,
+            IsAvailable = product.IsAvailable,
+            DateAdded = DateTime.UtcNow
+        };
+          
+        _context.Products.Add(producttoadd);
+
+        await _context.SaveChangesAsync();
+        return CreatedAtAction(nameof(GetProductById), new { id = producttoadd.ProductId},producttoadd);
+        throw new NotImplementedException();
+    }
+}
+
+/*topor*/
+using ExamProject.Data;
+using ExamProject.Models;
+using ExamProject.Models.DTOs;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+namespace ExamProject.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class StoreController : ControllerBase
+{
+    private readonly AppDbContext _context;
+
+    public StoreController(AppDbContext context)
+    {
+        _context = context;
+    }
+
+    // -----------------------------------------------------------------
+    // TASK 2.1: GetProductById (10 Points)
+    // Implement this method
+    // -----------------------------------------------------------------
+    [HttpGet("{id}")]
+    public async Task<ActionResult<ProductDto>> GetProductById(int id)
+    {
+        // STUDENT TODO:
+        // 1. Find the product by id.
+        // 2. Use Eager Loading (Include/ThenInclude) to load Category AND Tags.
+        // 3. If not found, return NotFound().
+        // 4. Return the product.
+
+        var product = await _context.Products.AsNoTracking()
+            .Include(c => c.Category)
+            .Include(t => t.ProductTags)
+            .ThenInclude(t => t.Tag)
+            .FirstOrDefaultAsync(c => c.ProductId == id);
+
+
+        if (product == null)
+        
+            return NotFound();
+        
+
+        //var dto = new ProductDto
+        //{
+        //    ProductId = product.ProductId,
+
+        //    CategoryId = product.CategoryId,
+        //    DateAdded = product.DateAdded,
+        //    Description = product.Description,
+        //    IsAvailable = product.IsAvailable,
+        //    Name = product.Name,
+        //    Price = product.Price,
+        //    Category = product.(new CategoryDto
+        //    {
+
+        //    })
+
+        //}
+
+
+        return Ok(product);
+
+    }
+
+    // -----------------------------------------------------------------
+    // TASK 2.2: SearchProducts (10 Points)
+    // Implement this method
+    // -----------------------------------------------------------------
+    [HttpGet("search")]
+    public async Task<ActionResult<IEnumerable<Product>>> SearchProducts(
+        [FromQuery] string? searchTerm,
+        [FromQuery] decimal? minPrice)
+    {
+        // STUDENT TODO:
+        // 1. Start with IQueryable: var query = _context.Products.AsQueryable();
+        // 2. If searchTerm is provided, add a .Where() clause to check Name OR Description.
+        // 3. If minPrice is provided, add a .Where() clause to check Price.
+        // 4. Use .AsNoTracking() for optimization.
+        // 5. Execute the query with .ToListAsync() and return the results.
+        var query = _context.Products.AsQueryable();
+
+        if (!string.IsNullOrEmpty(searchTerm) && minPrice.HasValue ) {
+            query.Where(t => t.Name.Contains(searchTerm) || t.Description.Contains(searchTerm)
+            && t.Price >= minPrice);
+        }
+
+        if (!string.IsNullOrEmpty(searchTerm) && !minPrice.HasValue)
+        {
+            query.Where(t => t.Name.Contains(searchTerm) || t.Description.Contains(searchTerm));
+        }
+
+        if (!string.IsNullOrEmpty(searchTerm) && minPrice.HasValue)
+        {
+            query.Where(t => t.Price >= minPrice);
+        }
+
+         var result = await query.ToListAsync();
+        if (result == null)
+        {
+            return NotFound();
+        }
+        return Ok(result);
+        
+    }
+
+    // -----------------------------------------------------------------
+    // TASK 2.3: GetCategoryStatistics (10 Points)
+    // Implement this method
+    // -----------------------------------------------------------------
+    [HttpGet("statistics")]
+    public async Task<IActionResult> GetCategoryStatistics()
+    {
+
+        var stat = _context.Categories.Select(a => new Category
+        {
+
+            Name = a.Name,
+            CategoryId = a.CategoryId,
+            Products = a.Products
+        }).ToListAsync();
+
+        return Ok(stat);
+       
+        // STUDENT TODO:
+        // 1. Query the Categories.
+        // 2. Use .Select() to project the results into a new anonymous object (or DTO).
+        // 3. The new object should have:
+        //    - CategoryName (from category.Name)
+        //    - ProductCount (using category.Products.Count())
+        // 4. Execute and return the list.
+
+    }
+
+    // -----------------------------------------------------------------
+    // TASK 3: CreateProduct (15 Points)
+    // Implement this method
+    // -----------------------------------------------------------------
+    [HttpPost]
+    public async Task<ActionResult<Product>> CreateProduct(ProductCreateDto dto)
+    {
+
+        var product = new Product
+            {
+            Name = dto.Name,
+            Description = dto.Description,
+            Price = dto.Price,
+            DateAdded = dto.DateAdded,
+            CategoryId= dto.CategoryId
+        };
+
+        
+        _context.Products.Add(product);
+        await _context.SaveChangesAsync();
+
+        //var productDto = new ProductDto
+        //{
+            
+        //    Name = product.Name,
+        //    Description = product.Description,
+        //    Price = product.Price,
+        //    Category = product.Category,
+        //    DateAdded = product.DateAdded
+        //};
+       
+        return CreatedAtAction(nameof(GetProductById), new { id = product.ProductId }, product);
+    }
+
+
+        // STUDENT TODO:
+        // 1. Add the 'product' entity to the DbContext.
+        // 2. Save the changes to the database.
+        // 3. Return a 201 Created response using CreatedAtAction.
+        //    Hint: nameof(GetProductById)
+
+        //throw new NotImplementedException();
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
