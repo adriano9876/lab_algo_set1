@@ -1,0 +1,10 @@
+Buongiorno,
+vi scrivo per comunicarvi i dettagli relativi al test di Entity Framework, che si terrà lunedì 10 novembre dalle ore 9:00 alle 13:00.
+Durante la prova vi verrà fornito un progetto Web API con un controller, al cui interno troverete gli endpoint vuoti relativi ai quesiti che dovrete completare.
+La parte di Entity Framework sarà esclusivamente Code First: dovrete creare i Models, configurare il DbContext e generare le migration.
+In aggiunta, vi sarà richiesto di implementare la CRUD di un’entità e di scrivere alcune query LINQ; per ogni query sarà già disponibile un endpoint GET dedicato e vuoto da completare.
+
+La documentazione che vi verrà fornita il giorno del test sarà: Appsettings con connection string al db sql, aggiunta del DbContext e retrieve della relativa connection string nel builder, il DbContext (costruttore vuoto e firma dell'OnModelCreating() ) infine un template di settaggio di una relazione N - N nel DbContext.
+Per qualsiasi dubbio prima del test potete contattare me o @Simone Stura (MSC Technology Italia).
+
+Buona continuazione di Academy.
