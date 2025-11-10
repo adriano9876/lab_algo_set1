@@ -1,0 +1,76 @@
+Entity Framework - Test Documentation
+Connection String
+
+"ConnectionStrings": {
+  "DefaultConnection": "Data Source=HQAPEW1C966-AAX;Database=MyDatabase;TrustServerCertificate=True;Id=sa;Password=SQL2019"
+}
+Program Configuration
+
+public static void Main(string[] args)
+{
+    // [..] Application builder initialization
+
+    string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+    builder.Services.AddDbContext<MyDbContext>(options =>
+        options.UseSqlServer(connectionString));
+}
+DbContext Template
+
+public class MyDbContext : DbContext
+{
+    public MyDbContext(DbContextOptions<MyDbContext> options) : base(options)
+    {
+    }
+
+    // […] DbSets declaration
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // […] Entity relationships declaration
+    }
+}
+Example: N–N Relationship Template
+
+modelBuilder.Entity<***>()
+    .HasMany(a => ***)
+    .WithMany(t => ***)
+    .UsingEntity(***,
+        ta => ta.HasOne(***)
+            .WithMany()
+            .HasForeignKey(***)
+            .IsRequired()
+            .HasPrincipalKey(***)
+            .OnDelete(***),
+        ta => ta.HasOne(***)
+            .WithMany()
+            .HasForeignKey(***)
+            .IsRequired()
+            .HasPrincipalKey(***)
+            .OnDelete(***),
+        ta =>
+        {
+            ta.IndexerProperty<***>(***);
+            ta.HasKey(***);
+        });
+Nota: Tutti i campi contrassegnati con *** devono essere completati secondo le entità e le relazioni del proprio modello EF.
+
+
+
+  Metodo	Descrizione breve
+Select	Proiezione
+SelectMany	Proiezione multipla
+Where	Filtro
+All	Tutti soddisfano
+Any	Almeno uno
+Contains	Contiene elemento
+Concat	Unisce sequenze
+Distinct	Rimuove duplicati
+OrderBy	Ordine crescente
+Average	Media valori
+Count	Conta elementi
+Max	Valore massimo
+Min	Valore minimo
+Sum	Somma valori
+Skip	Salta N elementi
+Take	Prendi N elementi
