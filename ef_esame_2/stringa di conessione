@@ -1,0 +1,71 @@
+
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "DefaultConnection": "Server= (localdb)\\MSSQLLocalDB  ;Database=Libreria01;Trusted_Connection=True;MultipleActiveResultSets=true"
+  }
+}
+
+/* -------------------------------------------------- */
+
+            builder.Services.AddDbContext<Models.LibreriaContext>
+            (options => options.UseSqlServer(builder.Configuration
+            .GetConnectionString("DefaultConnection")));
+
+/* -------------------------------------------------- */
+
+
+    public class LibreriaContext : DbContext
+    {
+        public LibreriaContext(DbContextOptions<LibreriaContext> options) : base(options) { }
+
+        public virtual DbSet<User> Users { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Book>()
+                .HasOne(u=>u.User)
+                .WithMany(b => b.Books)
+                .HasForeignKey(u => u.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+                .HasOne(w => w.WebPage)
+                .WithOne(u => u.User)
+                .HasForeignKey<WebPage>(w => w.UserId);
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Product>()
+                        .HasMany(product => product.Warehouses)
+                        .WithMany(warehouse => warehouse.Products)
+                        .UsingEntity(
+                            "ProductWarehouses",
+                            l => l.HasOne(typeof(Warehouse)).WithMany().HasForeignKey("WarehouseId").HasPrincipalKey(nameof(Warehouse.Id)).OnDelete(DeleteBehavior.Cascade),
+                            r => r.HasOne(typeof(Product)).WithMany().HasForeignKey("ProductId").HasPrincipalKey(nameof(Product.Id)).OnDelete(DeleteBehavior.Cascade),
+                            j => j.HasKey("WarehouseId", "ProductId")
+              );
+
+            modelBuilder.Entity<Warehouse>()
+                .HasData(
+                    new Warehouse { Id = 1, City = "italia" },
+                    new Warehouse { Id = 2, City = "germania" },
+
+                );
+
+
+        }
+    }
+
+/* -------------------------------------------------- */
+
+            builder.Services.AddScoped<IRepository, DbRepository>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+
+
+            
