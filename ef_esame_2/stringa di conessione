@@ -65,5 +65,8 @@
             builder.Services.AddScoped<IRepository, DbRepository>();
             builder.Services.AddScoped<IProductService, ProductService>();
 
+        [Required]
+        [Column(TypeName = "decimal(10,2)")]
+
 */
             
