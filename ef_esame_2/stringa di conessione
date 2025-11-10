@@ -1,4 +1,5 @@
 
+/*
 {
   "Logging": {
     "LogLevel": {
@@ -12,13 +13,12 @@
   }
 }
 
-/* -------------------------------------------------- */
 
             builder.Services.AddDbContext<Models.LibreriaContext>
             (options => options.UseSqlServer(builder.Configuration
             .GetConnectionString("DefaultConnection")));
 
-/* -------------------------------------------------- */
+
 
 
     public class LibreriaContext : DbContext
@@ -62,10 +62,8 @@
         }
     }
 
-/* -------------------------------------------------- */
-
             builder.Services.AddScoped<IRepository, DbRepository>();
             builder.Services.AddScoped<IProductService, ProductService>();
 
-
+*/
             
