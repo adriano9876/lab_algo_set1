@@ -304,3 +304,135 @@ namespace SqlAndEf.ExamProject.WebApi.Controllers
         #endregion
     }
 }
+
+
+
+using Microsoft.EntityFrameworkCore;
+using SqlAndEf.ExamProject.DataAccess.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace SqlAndEf.ExamProject.DataAccess
+{
+    public class UniversityDbContext : DbContext
+    {
+        /*
+         * DBCONTEXT CONFIGURATION:
+         * - Entities
+         * - Relationships
+         * - Migrations
+         * - Seeding
+         */
+        public DbSet<Student> Students { get; set; }
+        public DbSet<Teacher> Teachers { get; set; }
+        public DbSet<Course> Courses { get; set; }
+
+        public UniversityDbContext(DbContextOptions<UniversityDbContext> options) : base(options)
+        {
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Student>().HasKey(x => x.StudentId);
+            modelBuilder.Entity<Teacher>().HasKey(x => x.TeacherId);
+            modelBuilder.Entity<Course>().HasKey(x => x.CourseId);
+            modelBuilder.Entity<Teacher>().HasMany(x => x.Courses).WithOne(y => y.Teacher).HasForeignKey(y => y.TeacherId);
+
+            modelBuilder.Entity<Student>().HasData(
+                new Student
+                {
+                    StudentId = 1,
+                    Lastname = "Rossi",
+                    RegistrationNumber = "SIT76HJ",
+                    RegistrationDate = new DateOnly(2022, 09, 02),
+                    Gender = 'm'
+                });
+
+            modelBuilder.Entity<Teacher>().HasData(
+                new Teacher
+                {
+                    TeacherId = 1,
+                    Lastname = "Bianchi",
+                    Specialization = "Philosophy",
+                    HireDate = new DateOnly(2011, 09, 06),
+
+                });
+
+            modelBuilder.Entity<Course>().HasData(
+                new Course
+                {
+                    CourseId = 1,
+                    Name = "Philosophy",
+                    Cfu = 9,
+                    TotalHours = 80,
+                    TeacherId = 1
+                });
+
+            modelBuilder.Entity<Student>()
+                       .HasMany(a => a.Courses)
+                       .WithMany(t => t.Students)
+                       .UsingEntity<Dictionary<string, object>>("CoursesRegistrations",
+                           ta => ta.HasOne<Course>()
+                               .WithMany()
+                               .HasForeignKey("CourseId")
+                               .IsRequired()
+                               .HasPrincipalKey(nameof(Course.CourseId))
+                               .OnDelete(DeleteBehavior.Cascade),
+                           ta => ta.HasOne<Student>()
+                               .WithMany()
+                               .HasForeignKey("StudentId")
+                               .IsRequired()
+                               .HasPrincipalKey(nameof(Student.StudentId))
+                               .OnDelete(DeleteBehavior.Cascade),
+                           ta =>
+                           {
+
+                               ta.HasKey("StudentId", "CourseId");
+                               ta.Property<int>("StudentId");
+                               ta.Property<int>("CourseId");
+                               ta.HasData(
+                                   new
+                                   {
+                                       StudentId = 1,
+                                       CourseId = 1
+                                   }
+                                   );
+
+                           });
+
+
+
+            //        modelBuilder.Entity<Studente>()
+            //.HasMany(s => s.CorsiIscritto)
+            //.WithMany(c => c.StudentiIscritti)
+            //.UsingEntity<Dictionary<string, object>>(
+            //    "StudenteCorso",
+            //    sc => sc.HasOne<Corso>()
+            //        .WithMany()
+            //        .HasForeignKey("CorsoId")
+            //        .IsRequired()
+            //        .HasPrincipalKey(nameof(Corso.CorsoId))
+            //        .OnDelete(DeleteBehavior.Cascade),
+            //    sc => sc.HasOne<Studente>()
+            //        .WithMany()
+            //        .HasForeignKey("StudenteId")
+            //        .IsRequired()
+            //        .HasPrincipalKey(nameof(Studente.StudenteId))
+            //        .OnDelete(DeleteBehavior.Cascade),
+            //    sc =>
+            //    {
+            //        sc.HasKey("StudenteId", "CorsoId");
+            //        sc.Property<int>("StudenteId");
+            //        sc.Property<int>("CorsoId");
+            //    });
+
+
+
+
+        }
+    }
+}
