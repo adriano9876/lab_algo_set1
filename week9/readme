@@ -1,1 +1,306 @@
 add qualcosa
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SqlAndEf.ExamProject.DataAccess;
+using SqlAndEf.ExamProject.DataAccess.Models;
+using SqlAndEf.ExamProject.WebApi.Requests;
+using SqlAndEf.ExamProject.WebApi.Responses;
+using Swashbuckle.AspNetCore.SwaggerUI;
+
+namespace SqlAndEf.ExamProject.WebApi.Controllers
+{
+    [ApiController]
+    [Route("[controller]")]
+    public class UniversityController : ControllerBase
+    {
+        private UniversityDbContext _context;
+        public UniversityController(UniversityDbContext context)
+        {
+            _context = context;
+        }
+
+        #region CRUD ACTIONS
+
+        //a) Crea un corso
+        [HttpPost("courses/create")]
+        public async Task<IActionResult> CreateCourse(CreateCourseRequest request)
+        {
+            var course = new Course {
+                Name=request.Name,
+                Cfu=request.Cfu,
+                TotalHours=request.TotalHours,
+                TeacherId=request.TeacherId
+            };
+            _context.Courses.Add(course);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+        //b) Ritorna la lista di tutti i corsi
+        [HttpGet("courses")]
+        public async Task<ActionResult<ICollection<CourseResponse>>> GetAllCourses()
+        {
+            var res = await _context.Courses
+                .AsNoTracking()
+                .Select(x=> new CourseResponse
+                {
+                    Name=x.Name,
+                    Cfu=x.Cfu,
+                    TotalHours=x.TotalHours
+                })
+
+                .ToListAsync();
+            return Ok(res);
+        }
+
+        //c) Aggiorna i dati di un corso
+        [HttpPut("courses/update")]
+        public async Task<IActionResult> UpdateCourse(UpdateCourseRequest request)
+        {
+            if (request.CourseId < 0)
+            {
+                return BadRequest();
+            }
+            var updCourse = await _context.Courses.Where(x => x.CourseId == request.CourseId).FirstOrDefaultAsync();
+            updCourse.Name = request.Name;
+            updCourse.Cfu = request.Cfu;
+            updCourse.TeacherId = updCourse.TeacherId;
+            updCourse.TotalHours = request.TotalHours;
+            return Ok();
+        }
+
+        //d) Cancella un corso
+        [HttpDelete("courses/delete")]
+        public async Task<IActionResult> DeleteCourse(int id)
+        {
+            if(id<0)
+            {
+                return BadRequest();
+            }
+            var delCourse= await _context.Courses.Where(x => x.CourseId == id).FirstOrDefaultAsync();
+            if(delCourse==null)
+            {
+                return NotFound();
+            }
+            _context.Courses.Remove(delCourse);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+        //e) Crea uno studente
+        [HttpPost("students/create")]
+        public async Task<IActionResult> CreateStudent(CreateStudentRequest request)
+        {
+            var student = new Student
+            {
+                Lastname = request.Lastname,
+                Gender = request.Gender,
+                RegistrationDate = request.RegistrationDate,
+                RegistrationNumber = request.RegistrationNumber
+            };
+            _context.Students.Add(student);
+            await _context.SaveChangesAsync();
+            return Ok();
+
+        }
+
+        //f) Associa uno studente a un corso
+        [HttpPost("courses/associate-student")]
+        public async Task<IActionResult> AssociateStudentToCourse(int studentId, int courseId)
+        {
+            var student = await  _context.Students.Include(x=>x.Courses).Where(x => x.StudentId == studentId).FirstOrDefaultAsync();
+            var course = await _context.Courses.Include(x => x.Students).Where(x => x.CourseId == courseId).FirstOrDefaultAsync();
+            if (student == null || course == null)
+            { 
+                return NotFound(); 
+            }
+            student.Courses.Add(course);
+            course.Students.Add(student);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+        #endregion
+
+        #region QUERY ACTIONS
+
+        //a) GetAllTeacherFiltered
+        [HttpGet("teachers/byname")]
+        public async Task<ActionResult<ICollection<TeacherResponse>>> GetAllTeachersFiltered(string name)
+        {
+            var res = await _context.Teachers
+                .AsNoTracking()
+                .Where(x => x.Lastname.Contains(name))
+                .Select(x => new TeacherResponse
+                {
+                    Lastname = x.Lastname,
+                    HireDate = x.HireDate,
+                    Specialization = x.Specialization,
+                    TotalCourses = x.Courses.Count(),
+                    Courses = x.Courses.Select(x => x.Name).ToList()
+                })
+                .OrderBy(x=>x.Lastname)
+                .ToListAsync();
+            return Ok(res);
+        }
+
+        //b) GetStudentCareer
+        [HttpGet("students/bymatricola")]
+        public async Task<ActionResult<StudentResponse>> GetStudentCarrier(string regitrationNumber)
+        {
+            var res = await _context.Students
+                .AsNoTracking()
+                .Where(x => x.RegistrationNumber == regitrationNumber)
+                .Select(x => new StudentResponse
+                 {
+                    StudentId = x.StudentId,
+                    Lastname = x.Lastname,
+                    Gender = x.Gender,
+                    RegistrationNumber = x.RegistrationNumber,
+                    RegistrationDate = x.RegistrationDate,
+                    TotalCfu = x.Courses.Sum(x=>x.Cfu),
+                    Courses = x.Courses.Select(x => x.Name).ToList()
+                })
+                .FirstOrDefaultAsync();
+            return Ok(res);
+        }
+
+        //c) GetTopCoursesByEfficiency
+        [HttpGet("courses/byefficiency")]
+        public async Task<ActionResult<ICollection<object>>> GetTopCoursesByEfficiency(int n)
+        {
+            var res = await _context.Courses
+                .AsNoTracking()
+                .Select(x => new 
+                {
+                    Name = x.Name,
+                    Cfu = x.Cfu,
+                    TotalHours = x.TotalHours,
+                    RatioCfuHours = (double) x.Cfu / x.TotalHours
+                })
+                .OrderByDescending(x=>x.RatioCfuHours)
+                .Take(n)
+                .ToListAsync();
+            return Ok(res);
+        }
+
+        //d) GetStudentsByEnrollmentDate
+        [HttpGet("students/byenrollmentdate")]
+        public async Task<ActionResult<ICollection<object>>> GetStudentsByEnrollmentDate(DateOnly date, int courses)
+        {
+            var res = await _context.Students
+                .AsNoTracking()
+                .Where(x => x.RegistrationDate >= date && x.Courses.Count == courses)
+                .Select(x => new
+                {
+                    Name=x.Lastname,
+                    RegistrationDate=x.RegistrationDate,
+                    RegistrationNumber =x.RegistrationNumber,
+                    Gender=x.Gender,
+                    AvgHours=x.Courses.Average(x=>x.TotalHours)
+
+                })
+                .ToListAsync();
+            return Ok(res);
+        }
+
+        //e) GetStudentsByTeachersHireDate
+        [HttpGet("students/byteachershiredate")]
+        public async Task<ActionResult<ICollection<object>>> GetStudentsByTeachersHireDate(int startYear,int endYear)
+        {
+            var res = await _context.Teachers.AsNoTracking()                   
+                    .Where(x => x.HireDate.Year >= startYear && x.HireDate.Year <= endYear)
+                    .Select(x => new
+                    {
+                        Id = x.TeacherId,
+                        HireDate = x.HireDate.Year,
+                        Students = x.Courses.Select(x => x.Students.Select(y => y.Lastname)).ToList()
+                    }
+                    )
+                    .ToListAsync();
+            return Ok(res);                               
+                    
+        }
+
+        //f) GetUnEfficientStudents
+        [HttpGet("students/byefficiency")]
+        public async Task<ActionResult<ICollection<object>>> GetUnEfficientStudents()
+        {
+            var res = await _context.Students.AsNoTracking()
+                .Where(x=>x.Courses.Sum(y=>y.Cfu) < (DateTime.Now.Year-x.RegistrationDate.Year) * 60)
+                .Select(x=> new
+                {
+                    RegistrationNumber=x.RegistrationNumber,
+                    Cfu=(DateTime.Now.Year - x.RegistrationDate.Year ) * 60 -(x.Courses.Sum(y => y.Cfu))
+                    
+                }               
+                ).ToListAsync();
+            return Ok(res);
+        }
+
+        
+
+        #endregion
+    }
+}
