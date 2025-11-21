@@ -1,0 +1,176 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "DefaultConnection": "Server= (localdb)\\MSSQLLocalDB  ;Database=PetShop1;Trusted_Connection=True;MultipleActiveResultSets=true"
+  }
+}
+
+
+
+//installare fluent validation, moq, xunit
+
+//builder.Services.AddFluentValidationAutoValidation();
+//builder.Services.AddValidatorsFromAssemblyContaining<UserCreateValidator>();
+
+
+//builder.Services.AddDbContext<PetShotDbContext>
+//(options => options.UseSqlServer(builder.Configuration
+//.GetConnectionString("DefaultConnection")));
+
+
+//builder.Services.AddScoped<IPetRepository, PetRepository>();
+//builder.Services.AddScoped<IPetService, PetService>();
+
+
+//app.UseAuthorization();
+
+////app.UseMiddleware<PetShopMiddleware>();
+
+//app.UseWhen(ctx => ctx.Request.Path.StartsWithSegments("/api"), subApp =>
+//{
+//    subApp.UseMiddleware<PetShopMiddleware>();
+//});
+
+
+/*middlewere*/
+    //public class PetShopMiddleware
+    //{
+    //    private readonly RequestDelegate _next;
+    //    private readonly ILogger<PetShopMiddleware> _logger;
+
+    //    public PetShopMiddleware(RequestDelegate next, ILogger<PetShopMiddleware> logger)
+    //    {
+    //        _next = next;
+    //        _logger = logger;
+    //    }
+
+    //    public async Task Invoke(HttpContext context)
+    //    {
+
+    //        //Console.WriteLine("prima next M1 : ----> " + context.Request);
+    //        _logger.LogInformation($"{context.Request.Method} --> {context.Request.Path}");
+    //        await _next(context);
+    //        if (context.Response.StatusCode > 300)
+    //        {
+    //            _logger.LogError($"{context.Response} --> {context.Request.Path}");
+    //        }
+    //        else
+    //        {
+    //            _logger.LogInformation($"{context.Response} --> {context.Request.Path}");
+    //        }
+    //        //Console.WriteLine("dopo next M1 : ----> " + context.Response);
+    //    }
+    //}
+
+/*validator*/
+    //public class UserCreateValidator: AbstractValidator<UserRequest>
+    //{
+    //    public UserCreateValidator()
+    //    {
+    //        RuleFor(x => x.Nome).NotEmpty().WithMessage("ci deve essere almeno un carattere");
+    //        RuleFor(x => x.Id)  .GreaterThan(0).WithMessage("inserisci un numero positivo");
+    //    }
+
+    //}
+
+
+/*construttore*/
+     //   private readonly PetShotDbContext _context;
+
+        //public PetRepository(PetShotDbContext context)
+        //{            _context = context;        }
+
+
+/*create e mod*/
+
+        //[HttpPost("courses/create")]
+        //public async Task<ActionResult<int>> CreateCourse(CourseDto dto)
+        //{
+        //    Teacher teacher =await _context.Teachers.AsNoTracking().SingleOrDefaultAsync(t => t.Id==dto.TeacherId);
+        //    if (teacher == null)
+        //    {
+        //        return BadRequest();
+        //    }
+
+        //    Course toDb = new Course
+        //    {
+        //        Nome = dto.Nome,
+        //        CfuTotali = dto.CfuTotali,
+        //        TotaleOrePreviste = dto.TotaleOrePreviste,
+        //        TeacherId = dto.TeacherId
+        //    };
+
+        //    var ris = _context.Courses.Add(toDb);
+        //    await _context.SaveChangesAsync();
+        //    return Ok(toDb.Id);
+        //}
+
+
+
+        //[HttpPut("courses/update")]
+        //public async Task<ActionResult> UpdateCourse(CourseDtoUpdate dto)
+        //{
+        //    Teacher teacher = await _context.Teachers.AsNoTracking().SingleOrDefaultAsync(t => t.Id == dto.TeacherId);
+        //    if (teacher == null)
+        //    {
+        //        return BadRequest();
+        //    }
+
+        //    var corso = await _context.Courses.FirstOrDefaultAsync(c => c.Id == dto.Id);
+        //    if(corso == null)
+        //    {
+        //        return BadRequest();
+        //    }
+                
+        //    corso.Nome = dto.Nome;
+        //    corso.CfuTotali = dto.CfuTotali;
+        //    corso.TotaleOrePreviste = dto.TotaleOrePreviste;
+        //    corso.TeacherId = dto.TeacherId;     
+        //    await _context.SaveChangesAsync();
+        //    return Ok();
+        //}
+
+
+
+        //[HttpDelete("courses/delete/{id}")]
+        //public async Task<ActionResult<bool>> DeleteCourse(int id)
+        //{
+        //    Course corso = await _context.Courses.FirstOrDefaultAsync(c => c.Id == id);
+        //    if (corso == null)
+        //    {
+        //        return BadRequest();
+        //    }
+        //    _context.Courses.Remove(corso);
+        //    await _context.SaveChangesAsync();
+        //    return Ok(true);
+        //}
+
+    //f Associa uno studente a un corso -FATTO
+    //[HttpPost("courses/associate-student")]
+    //public async Task<ActionResult<int>> AssociateStudentToCourse(int student, int course)
+    //{
+    //    Student studente = await _context.Students.Include(s => s.Courses).FirstOrDefaultAsync(s => s.Id == student);
+    //    Course corso = await _context.Courses.FirstOrDefaultAsync(c => c.Id == course);
+
+    //    if(studente == null || corso == null)
+    //    {
+    //        return BadRequest();
+    //    }
+
+    //    if (studente.Courses.Contains(corso))
+    //    {
+    //        return BadRequest();
+    //    }
+
+    //    studente.Courses.Add(corso);
+    //    var ret = _context.SaveChanges();
+
+    //    return Ok(ret);
+    //}
+
